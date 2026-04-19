@@ -80,10 +80,7 @@ wss.on("connection", (ws, req) => {
       return;
     }
 
-    // === типы сообщений ===
-
-    // 1. Сообщение всем
-    if (data.type === "broadcast") {
+    if (data.type === "message") {
       for (const [id, clientData] of clients.entries()) {
         const client = clientData.ws;
         if (client.readyState === WebSocket.OPEN) {
@@ -97,8 +94,7 @@ wss.on("connection", (ws, req) => {
       }
     }
 
-    // 2. Личное сообщение
-    if (data.type === "private") {
+    if (data.type === "message_private") {
       const target = clients.get(data.to);
 
       if (target && target.ws.readyState === WebSocket.OPEN) {
@@ -111,7 +107,6 @@ wss.on("connection", (ws, req) => {
       }
     }
 
-    // 3. Гет
     if (data.type === "getclients") {
       if (ws.readyState === WebSocket.OPEN) {
         let clientsIds = [];
