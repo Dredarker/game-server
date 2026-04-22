@@ -61,14 +61,14 @@ function update() {
 		objects.forEach((obj2, name) => {
 			let obj1 = obj;
 			if (obj1 == obj2) return;
-			if (obj.mode == "static") return;
+			if (obj1.mode == "static") return;
 			/*
 			objRealX1 = obj1.x+obj1.width/2;
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
 			*/
-			obj.onGround = false;
+			obj1.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
