@@ -9,12 +9,12 @@ const adminIp = "5.137.96.67";
 const bannedIps = new Set([
   "123.123.123.123"
 ]);
-
+/*
 let HTMLclient;
-fetch('client/index.html')
+fetch('https://github.com/Dredarker/game-server/raw/refs/heads/main/client/index.html')
   .then((response) => {HTMLclient = response.text()})
   .catch(error => console.error('Ошибка загрузки клиента:', error));
-
+*/
 const server = http.createServer((req, res) => {
   if (req.url === "/") {
     res.writeHead(200, { "Content-Type": "text/html" });
@@ -56,25 +56,30 @@ function update() {
 			let obj1 = obj;
 			if (obj1 == obj2) return;
 			if (obj.mode == "static") return;
-
+			/*
 			objRealX1 = obj1.x+obj1.width/2;
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
+			*/
 			if (obj.type === "player") obj.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
+					obj1.vy = obj2.vy;
 					obj1.vy = 0;
 					obj1.y = obj2.y - obj1.height;
 					obj1.onGround = true;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
+					obj1.vy = obj2.vy;
 					obj1.vy = 0;
 					obj1.y = obj2.y + obj2.height + obj1.height;
 				}
 				if (objInRegion(obj1, obj2.x, obj2.y+5, obj2.width/2, obj2.height-10)) {
+					obj1.vx = obj2.vx;
 					obj1.vx = 0;
 					obj1.x = obj2.x - obj1.width;
 				} else if (objInRegion(obj1, obj2.x+obj2.width/2, obj2.y+5, obj2.width/2, obj2.height-10)) {
+					obj1.vx = obj2.vx;
 					obj1.vx = 0;
 					obj1.x = obj2.x + obj2.width;
 				}
@@ -103,15 +108,21 @@ function Obj(x, y, width, height, mode, type) {
 	this.type = type;
 }
 
-function Player(speed, jumpPower, obj) {
+function Player(nickname, speed, jumpPower, obj) {
 	for (let i in obj) {
 		this[i] = obj[i]
 	}
+	this.nickname = nickname;
 	this.speed = speed;
 	this.jumpPower = jumpPower;
 }
 
 console.log("The game was successful initializated");
+
+setInterval(() => {
+	update();
+	
+}, 50);
 
 // server
 wss.on("connection", (ws, req) => {
@@ -137,30 +148,25 @@ wss.on("connection", (ws, req) => {
   // сохраняем клиента
   clients.set(clientId, {
     ws,
-    ip
+    ip,
+		nickname
   });
 
   console.log(`Client connected: ${clientId} (${ip})`);
-
-  for (const [id, clientData] of clients.entries()) {
-    const client = clientData.ws;
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({
-        type: "connect",
-        text: clientId,
-        ip: (clientData.ip == adminIp ? ip : "none")
-      }));
-    }
-  }
   // отправляем клиенту его данные
   ws.send(JSON.stringify({
     type: "init",
     clientId,
-    ip
+    ip,
+		nickname
   }));
 
   ws.on("message", (message) => {
     let data;
+		let mywsdata;
+		for (const [id, clientData] of clients.entries()) {
+			if (clientData.ws === ws) {mywsdata = clientData;break;}
+		}
 
     try {
       data = JSON.parse(message);
@@ -168,9 +174,17 @@ wss.on("connection", (ws, req) => {
       return;
     }
 
+		if (!wsid.joined) {
+			if (data.type === "join") {
+      	for (const [id, clientData] of clients.entries()) {
+					if (clientData.ws === ws) {clients.get(id).nickname = data.nickname; break;}
+      	}
+			}
+    } else ws.close();
+
     if (data.type === "sync") {
       for (const [id, clientData] of clients.entries()) {
-        const client = clientData.ws;
+        if (clientData.ws !== ws) return;
         if (client.readyState === WebSocket.OPEN) {
           objects.forEach((obj, name) => {
 		      	if (obj.type === "player") {
@@ -187,19 +201,7 @@ wss.on("connection", (ws, req) => {
       }
     }
 
-    if (data.type === "message") {
-      for (const [id, clientData] of clients.entries()) {
-        const client = clientData.ws;
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({
-            type: "message",
-            from: clientId,
-            text: data.text,
-            ip: (clientData.ip == adminIp ? ip : "none")
-          }));
-        }
-      }
-    }
+    if (data.type === "msg") msg(nickname, clients, data.text);
 
     if (data.type === "getclients") {
       if (ws.readyState === WebSocket.OPEN) {
@@ -218,21 +220,26 @@ wss.on("connection", (ws, req) => {
   ws.on("close", () => {
     console.log(`Client disconnected: ${clientId}`);
     clients.delete(clientId);
-    for (const [id, clientData] of clients.entries()) {
-      const client = clientData.ws;
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
-          type: "disconnect",
-          text: clientId,
-          ip: (clientData.ip == adminIp ? ip : "none")
-        }));
-      }
-    }
+    msg("", clients, `${nickname} disconnected from game`);
   });
 
   ws.on("error", (err) => {
     console.error(`Error (${clientId}, ${ip}):`, err);
   });
+
+	function msg(from, to, text) {
+		for (const [id, clientData] of to.entries()) {
+        const client = clientData.ws;
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: "msg",
+            from,
+            text,
+            ip: (clientData.ip == adminIp ? clientData.ip : "none")
+          }));
+        }
+      }
+	}
 });
 
 server.listen(PORT, () => {
