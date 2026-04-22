@@ -180,9 +180,11 @@ wss.on("connection", (ws, req) => {
       	for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
 						clients.get(id).nickname = data.nickname;
+						objects.set(clientId, new Player(data.nickname, 1.1, -11, new Obj(0, 0, 50, 50, "player", "dynamic")));
+						msg("", clients, `${nickname} connected to game`);
+						mywsdata.joined = true;
 						break;
 					}
-					mywsdata.joined = true
       	}
 			}
     } else ws.close();
@@ -191,7 +193,7 @@ wss.on("connection", (ws, req) => {
       for (const [id, clientData] of clients.entries()) {
         if (clientData.ws !== ws) return;
         if (client.readyState === WebSocket.OPEN) {
-          objects.forEach((obj, name) => {
+          .forEach((obj, name) => {
 		      	if (obj.type === "player") {
 			    	if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      			else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
@@ -225,6 +227,7 @@ wss.on("connection", (ws, req) => {
   ws.on("close", () => {
     console.log(`Client disconnected: ${clientId}`);
     clients.delete(clientId);
+		objects.delete(clientId);
     msg("", clients, `${nickname} disconnected from game`);
   });
 
@@ -234,19 +237,19 @@ wss.on("connection", (ws, req) => {
 
 	function msg(from, to, text) {
 		for (const [id, clientData] of to.entries()) {
-        const client = clientData.ws;
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({
-            type: "msg",
-            from,
-            text,
-            ip: (clientData.ip == adminIp ? clientData.ip : "none")
-          }));
-        }
+      const client = clientData.ws;
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({
+          type: "msg",
+          from,
+          text,
+          ip: (clientData.ip == adminIp ? clientData.ip : "none")
+        }));
       }
+    }
 	}
 });
 
 server.listen(PORT, () => {
-  console.log("HTTP Server running on port ", PORT);
+  console.log("HTTPS server started on port ", PORT);
 });
