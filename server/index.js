@@ -173,16 +173,16 @@ wss.on("connection", (ws, req) => {
         const client = clientData.ws;
         if (client.readyState === WebSocket.OPEN) {
           objects.forEach((obj, name) => {
-		      if (obj.type === "player") {
-			      if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround);
-	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
-	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
-	      		if (keys["Space"] && obj.onGround) {
-	      			obj.vy = obj.jumpPower;
-		      		obj.onGround = false;
-		      	}
-	      	}
-		  }
+		      	if (obj.type === "player") {
+			    	if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
+	      			else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
+	      			obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
+	      			if (keys["Space"] && obj.onGround) {
+	      				obj.vy = obj.jumpPower;
+		      			obj.onGround = false;
+		      		}
+	      		}
+		  		});
         }
       }
     }
