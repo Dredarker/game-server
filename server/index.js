@@ -64,7 +64,7 @@ function update() {
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
 			*/
-			if (obj.type === "player") obj.onGround = false;
+			obj.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
