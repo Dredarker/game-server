@@ -182,6 +182,7 @@ wss.on("connection", (ws, req) => {
 		      		obj.onGround = false;
 		      	}
 	      	}
+		  }
         }
       }
     }
