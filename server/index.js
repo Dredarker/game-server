@@ -119,10 +119,15 @@ function Player(nickname, speed, jumpPower, obj) {
 	this.jumpPower = jumpPower;
 }
 
+function server_sync() {
+	f
+}
+
 console.log("The game was successful initializated");
 
 setInterval(() => {
 	update();
+	server_sync();
 }, 50);
 
 // server
@@ -155,7 +160,6 @@ wss.on("connection", (ws, req) => {
   });
 
   console.log(`Client connected: ${clientId} (${ip})`);
-  // отправляем клиенту его данные
   ws.send(JSON.stringify({
     type: "init",
     clientId,
@@ -235,16 +239,16 @@ wss.on("connection", (ws, req) => {
 
 	function msg(from, to, text) {
 		for (const [id, clientData] of to.entries()) {
-      const client = clientData.ws;
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
-          type: "msg",
-          from,
-          text,
-          ip: (clientData.ip == adminIp ? clientData.ip : "none")
-        }));
-      }
-    }
+  	  const client = clientData.ws;
+  	  if (client.readyState === WebSocket.OPEN) {
+  	    client.send(JSON.stringify({
+	        type: "msg",
+	        from,
+	        text,
+	        ip: (clientData.ip == adminIp ? clientData.ip : "none")
+	      }));
+	    }
+	  }
 	}
 });
 
