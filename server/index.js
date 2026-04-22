@@ -159,7 +159,6 @@ wss.on("connection", (ws, req) => {
   ws.send(JSON.stringify({
     type: "init",
     clientId,
-		nickname,
   }));
 
   ws.on("message", (message) => {
