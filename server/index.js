@@ -9,12 +9,12 @@ const adminIp = "5.137.96.67";
 const bannedIps = new Set([
   "123.123.123.123"
 ]);
-/*
+
 let HTMLclient;
 fetch('https://github.com/Dredarker/game-server/raw/refs/heads/main/client/index.html')
   .then((response) => {HTMLclient = response.text()})
   .catch(error => console.error('Ошибка загрузки клиента:', error));
-*/
+
 const server = http.createServer((req, res) => {
   if (req.url === "/") {
     res.writeHead(200, { "Content-Type": "text/html" });
