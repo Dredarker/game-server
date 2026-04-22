@@ -44,7 +44,11 @@ objects.set("platform", new Obj(-500, 0, 100, 100, "static", ""));
 
 function update() {
 	objects.forEach((obj, name) => {
-		if (obj.mode === "dynamic") obj.vy += gravity;
+		if (obj.mode === "dynamic") {
+			obj.vy += gravity;
+			obj.vx = obj.vx * 0.9 + 0.1 * obj.onGround;
+			obj.vy = obj.vy * 0.95;
+		}
 		
 		if (
 			obj.mode === "dynamic" ||
@@ -69,7 +73,7 @@ function update() {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y - obj1.height;
-					obj.onGround = true;
+					obj1.onGround = true;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y + obj2.height + obj1.height;
