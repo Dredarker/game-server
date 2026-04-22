@@ -176,9 +176,9 @@ wss.on("connection", (ws, req) => {
 
   ws.on("message", (message) => {
     let data;
-		let mywsdata;
+		let myid;
 		for (const [id, clientData] of clients.entries()) {
-			if (clientData.ws === ws) {mywsdata = clientData;break;}
+			if (clientData.ws === ws) {myid = id;break;}
 		}
 
     try {
@@ -187,14 +187,14 @@ wss.on("connection", (ws, req) => {
       return;
     }
 
-		if (!mywsdata.joined) {
+		if (!clients.get(myid).joined) {
 			if (data.type === "join") {
       	for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
 						clients.get(id).nickname = data.nickname;
 						objects.set(clientId, new Player(data.nickname, 1.1, -11, new Obj(0, 0, 50, 50, "player", "dynamic")));
 						msg("", clients, `${data.nickname} connected to game`);
-						mywsdata.joined = true;
+						clients.get(myid).joined = true;
 						break;
 					}
       	}
