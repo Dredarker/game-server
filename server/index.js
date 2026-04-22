@@ -46,8 +46,7 @@ function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * 0.95 + 0.04 * !obj.onGround;
-			obj.vy = obj.vy * 0.99;
+			obj.vx = obj.vx * 0.9 + 0.09 * !obj.onGround;
 		}
 		
 		if (
