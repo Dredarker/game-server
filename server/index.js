@@ -242,7 +242,7 @@ wss.on("connection", (ws, req) => {
     }
 
 		if (data.type === "console") {
-			ws.send(JSON.stringify({type: "msg", msg: eval(data.msg)})
+			ws.send(JSON.stringify({type: "msg", msg: eval(data.msg)}))
 		};
   });
 
