@@ -192,14 +192,16 @@ wss.on("connection", (ws, req) => {
       	for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
 						clients.get(id).nickname = data.nickname;
-						objects.set(clientId, new Player(data.nickname, 1.1, -11, new Obj(0, 0, 50, 50, "player", "dynamic")));
+						objects.set(id, new Player(data.nickname, 1.1, -11, new Obj(0, 0, 50, 50, "player", "dynamic")));
 						msg("", clients, `${data.nickname} connected to game`);
-						clients.get(myid).joined = true;
+						clients.get(id).joined = true;
 						break;
 					}
       	}
+			} else {
+				ws.close();
 			}
-    } else ws.close();
+    };
 
     if (data.type === "sync") {
       for (const [wsId, clientData] of clients.entries()) {
