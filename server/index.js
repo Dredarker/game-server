@@ -104,6 +104,7 @@ function Obj(x, y, width, height, mode, type) {
 	this.vy = 0;
 	this.mode = mode;
 	this.type = type;
+	this.onGround = false;
 }
 
 function Player(nickname, speed, jumpPower, obj) {
@@ -238,7 +239,7 @@ wss.on("connection", (ws, req) => {
     }
 
 		if (data.type === "console") {
-			ws.send(eval(data.msg));
+			msg("", [ws], eval(data.msg))
 		};
   });
 
