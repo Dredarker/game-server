@@ -123,7 +123,6 @@ console.log("The game was successful initializated");
 
 setInterval(() => {
 	update();
-	
 }, 50);
 
 // server
@@ -145,13 +144,14 @@ wss.on("connection", (ws, req) => {
     return;
   }
 
-  const clientId = uuidv4().slice(0, 7);
+  const clientId = uuidv4().slice(0, 16);
 
   // сохраняем клиента
   clients.set(clientId, {
     ws,
     ip,
-		nickname
+		nickname: "",
+		joined: false,
   });
 
   console.log(`Client connected: ${clientId} (${ip})`);
@@ -159,8 +159,7 @@ wss.on("connection", (ws, req) => {
   ws.send(JSON.stringify({
     type: "init",
     clientId,
-    ip,
-		nickname
+		nickname,
   }));
 
   ws.on("message", (message) => {
@@ -176,10 +175,14 @@ wss.on("connection", (ws, req) => {
       return;
     }
 
-		if (!wsid.joined) {
+		if (!mywsdata.joined) {
 			if (data.type === "join") {
       	for (const [id, clientData] of clients.entries()) {
-					if (clientData.ws === ws) {clients.get(id).nickname = data.nickname; break;}
+					if (clientData.ws === ws) {
+						clients.get(id).nickname = data.nickname;
+						break;
+					}
+					mywsdata.joined = true
       	}
 			}
     } else ws.close();
