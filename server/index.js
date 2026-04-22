@@ -244,7 +244,7 @@ wss.on("connection", (ws, req) => {
   	console.log(`Client disconnected: ${clientId}`);
     clients.delete(clientId);
 		objects.delete(clientId);
-    msg("", clients, `${nickname} disconnected from game`);
+    msg("", clients, `${clients.get(clientId).nickname} disconnected from game`);
   });
 
   ws.on("error", (err) => {
@@ -259,7 +259,7 @@ wss.on("connection", (ws, req) => {
 	        type: "msg",
 	        from,
 	        text,
-	        ip: (clientData.ip == adminIp ? clientData.ip : "none"),
+	        ip: (clientData.ip == adminIp ? clients.get(clientId).ip : "none"),
 	      }));
 	    }
 	  }
