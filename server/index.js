@@ -137,7 +137,7 @@ console.log("The game was successful initializated");
 setInterval(() => {
 	update();
 	server_sync();
-}, 100);
+}, 50);
 
 // server
 wss.on("connection", (ws, req) => {
