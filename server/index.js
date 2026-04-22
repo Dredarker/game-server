@@ -120,7 +120,15 @@ function Player(nickname, speed, jumpPower, obj) {
 }
 
 function server_sync() {
-	f
+	for (const [id, clientData] of to.entries()) {
+  	const client = clientData.ws;
+  	if (client.readyState === WebSocket.OPEN) {
+  	  client.send(JSON.stringify({
+	      type: "sync",
+				world: Object.fromEntries(objects)
+	    }));
+	  }
+	}
 }
 
 console.log("The game was successful initializated");
@@ -193,19 +201,20 @@ wss.on("connection", (ws, req) => {
     } else ws.close();
 
     if (data.type === "sync") {
-      for (const [id, clientData] of clients.entries()) {
+      for (const [wsId, clientData] of clients.entries()) {
         if (clientData.ws !== ws) return;
         if (client.readyState === WebSocket.OPEN) {
-          objects.forEach((obj, name) => {
+          objects.forEach((obj, objId) => {
+						if (objId !== wsId) return;
 		      	if (obj.type !== "player") return;
-			    if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
+			    	if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
 	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
 	      		if (keys["Space"] && obj.onGround) {
 	      			obj.vy = obj.jumpPower;
 		      		obj.onGround = false;
 		      	}
-		  });
+		  		});
         }
       }
     }
@@ -218,6 +227,7 @@ wss.on("connection", (ws, req) => {
         for (let i of clients.keys()) {
           clientsIds.push(i);
         }
+
         ws.send(JSON.stringify({
           type: "getclients",
           text: clientsIds
