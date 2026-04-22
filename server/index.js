@@ -67,21 +67,17 @@ function update() {
 			if (obj.type === "player") obj.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
-					obj2.vy = obj1.vy;
 					obj1.vy = 0;
 					obj1.y = obj2.y - obj1.height;
-					obj1.onGround = true;
+					obj.onGround = true;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
-					obj2.vy = obj1.vy;
 					obj1.vy = 0;
 					obj1.y = obj2.y + obj2.height + obj1.height;
 				}
 				if (objInRegion(obj1, obj2.x, obj2.y+5, obj2.width/2, obj2.height-10)) {
-					obj2.vx = obj1.vx;
 					obj1.vx = 0;
 					obj1.x = obj2.x - obj1.width;
 				} else if (objInRegion(obj1, obj2.x+obj2.width/2, obj2.y+5, obj2.width/2, obj2.height-10)) {
-					obj2.vx = obj1.vx;
 					obj1.vx = 0;
 					obj1.x = obj2.x + obj2.width;
 				}
