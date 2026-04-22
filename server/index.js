@@ -206,14 +206,15 @@ wss.on("connection", (ws, req) => {
         if (client.readyState === WebSocket.OPEN) {
           objects.forEach((obj, objId) => {
 						if (objId !== wsId) return;
-		      	if (obj.type !== "player") return;
-			    	if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
+		    		if (obj.type !== "player") return;
+						let keys = data.keys;
+						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
 	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
 	      		if (keys["Space"] && obj.onGround) {
 	      			obj.vy = obj.jumpPower;
 		      		obj.onGround = false;
-		      	}
+		    		}
 		  		});
         }
       }
@@ -236,27 +237,27 @@ wss.on("connection", (ws, req) => {
     }
   });
 
-  ws.on("close", () => {
-    console.log(`Client disconnected: ${clientId}`);
+	ws.on("close", () => {
+  	console.log(`Client disconnected: ${clientId}`);
     clients.delete(clientId);
 		objects.delete(clientId);
     msg("", clients, `${nickname} disconnected from game`);
   });
 
   ws.on("error", (err) => {
-    console.error(`Error (${clientId}, ${ip}):`, err);
-  });
+  	console.error(`Error (${clientId}, ${ip}):`, err);
+ 	});
 
 	function msg(from, to, text) {
 		for (const [id, clientData] of to.entries()) {
-  	  const client = clientData.ws;
-  	  if (client.readyState === WebSocket.OPEN) {
-  	    client.send(JSON.stringify({
-	        type: "msg",
-	        from,
-	        text,
-	        ip: (clientData.ip == adminIp ? clientData.ip : "none")
-	      }));
+  	  	const client = clientData.ws;
+  	  	if (client.readyState === WebSocket.OPEN) {
+  	    	client.send(JSON.stringify({
+	        	type: "msg",
+	        	from,
+	        	text,
+	        	ip: (clientData.ip == adminIp ? clientData.ip : "none"),
+	      	}));
 	    }
 	  }
 	}
