@@ -121,7 +121,7 @@ function Player(nickname, speed, jumpPower, obj) {
 
 function server_sync() {
 	for (const [id, clientData] of clients.entries()) {
-		if (clientData.joined) return;
+		if (!clientData.joined) return;
   	const client = clientData.ws;
   	if (client.readyState === WebSocket.OPEN) {
   	  client.send(JSON.stringify({
