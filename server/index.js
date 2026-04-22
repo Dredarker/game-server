@@ -203,7 +203,8 @@ wss.on("connection", (ws, req) => {
 
     if (data.type === "sync") {
       for (const [wsId, clientData] of clients.entries()) {
-        if (clientData.ws !== ws) return;
+				let client = clientData.ws;
+        if (client !== ws) return;
         if (client.readyState === WebSocket.OPEN) {
           objects.forEach((obj, objId) => {
 						if (objId !== wsId) return;
