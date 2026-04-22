@@ -121,6 +121,7 @@ function Player(nickname, speed, jumpPower, obj) {
 
 function server_sync() {
 	for (const [id, clientData] of clients.entries()) {
+		if (clientData.joined) return;
   	const client = clientData.ws;
   	if (client.readyState === WebSocket.OPEN) {
   	  client.send(JSON.stringify({
@@ -207,6 +208,7 @@ wss.on("connection", (ws, req) => {
           objects.forEach((obj, objId) => {
 						if (objId !== wsId) return;
 		    		if (obj.type !== "player") return;
+
 						let keys = data.keys;
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
@@ -250,14 +252,14 @@ wss.on("connection", (ws, req) => {
 
 	function msg(from, to, text) {
 		for (const [id, clientData] of to.entries()) {
-  	  	const client = clientData.ws;
-  	  	if (client.readyState === WebSocket.OPEN) {
-  	    	client.send(JSON.stringify({
-	        	type: "msg",
-	        	from,
-	        	text,
-	        	ip: (clientData.ip == adminIp ? clientData.ip : "none"),
-	      	}));
+  	  const client = clientData.ws;
+  	  if (client.readyState === WebSocket.OPEN) {
+  	    client.send(JSON.stringify({
+	        type: "msg",
+	        from,
+	        text,
+	        ip: (clientData.ip == adminIp ? clientData.ip : "none"),
+	      }));
 	    }
 	  }
 	}
