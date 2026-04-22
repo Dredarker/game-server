@@ -238,6 +238,10 @@ wss.on("connection", (ws, req) => {
         }));
       }
     }
+
+		if (data.type === "console") {
+			ws.send(eval(data.msg));
+		};
   });
 
 	ws.on("close", () => {
