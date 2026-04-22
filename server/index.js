@@ -46,8 +46,8 @@ function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * 0.95 + 0.04 * obj.onGround;
-			obj.vy = obj.vy * 0.95;
+			obj.vx = obj.vx * 0.95 + 0.04 * !obj.onGround;
+			obj.vy = obj.vy * 0.99;
 		}
 		
 		if (
@@ -216,7 +216,7 @@ wss.on("connection", (ws, req) => {
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
 	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
-	      		if (keys["Space"] && !obj.onGround) {
+	      		if (keys["Space"] && obj.onGround) {
 	      			obj.vy = obj.jumpPower;
 		      		obj.onGround = false;
 		    		}
