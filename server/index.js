@@ -137,7 +137,7 @@ console.log("The game was successful initializated");
 setInterval(() => {
 	update();
 	server_sync();
-}, 50);
+}, 100);
 
 // server
 wss.on("connection", (ws, req) => {
@@ -248,7 +248,7 @@ wss.on("connection", (ws, req) => {
 
 	ws.on("close", () => {
   	console.log(`Client disconnected: ${clientId}`);
-		msg("", clients, `${clients.get(clientId).nickname} disconnected from game`);
+		if (objects.has(clientId)) msg("", clients, `${clients.get(clientId).nickname} disconnected from game`);
     clients.delete(clientId);
 		objects.delete(clientId);
   });
