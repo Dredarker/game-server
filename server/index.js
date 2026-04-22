@@ -46,7 +46,7 @@ function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * 0.9 + 0.1 * obj.onGround;
+			obj.vx = obj.vx * 0.95 + 0.04 * obj.onGround;
 			obj.vy = obj.vy * 0.95;
 		}
 		
@@ -67,13 +67,12 @@ function update() {
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
-			obj1.onGround = false;
+			object.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y - obj1.height;
 					obj1.onGround = true;
-					msg("", clients, obj1.onGround);
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y + obj2.height + obj1.height;
@@ -217,7 +216,7 @@ wss.on("connection", (ws, req) => {
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
 	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
-	      		if (keys["Space"] && obj.onGround) {
+	      		if (keys["Space"] && !obj.onGround) {
 	      			obj.vy = obj.jumpPower;
 		      		obj.onGround = false;
 		    		}
