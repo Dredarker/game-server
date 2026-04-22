@@ -120,7 +120,7 @@ function Player(nickname, speed, jumpPower, obj) {
 }
 
 function server_sync() {
-	for (const [id, clientData] of to.entries()) {
+	for (const [id, clientData] of clients.entries()) {
   	const client = clientData.ws;
   	if (client.readyState === WebSocket.OPEN) {
   	  client.send(JSON.stringify({
