@@ -41,14 +41,14 @@ const gravity = 0.5;
 const objects = new Map();
 objects.set("bottom", new Obj(-500, 100, 1000, 100, "static", ""));
 objects.set("leftbox", new Obj(-600, 0, 100, 100, "static", ""));
-objects.set("leftbox", new Obj(500, 0, 100, 100, "static", ""));
+objects.set("rightbox", new Obj(500, 0, 100, 100, "static", ""));
 
 function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * (0.9 + 0.09 * !obj.onGround);
-			obj.vx *= 0.99;
+			obj.vx = obj.vx * (0.9 + 0.099 * !obj.onGround);
+			obj.vx *= 0.999;
 		}
 		
 		if (
@@ -68,7 +68,7 @@ function update() {
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
-			obj.onGround = false;
+			//obj.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
@@ -138,7 +138,7 @@ console.log("The game was successful initializated");
 setInterval(() => {
 	update();
 	server_sync();
-}, 1000 / 60);
+}, 1000 / 50);
 
 // server
 wss.on("connection", (ws, req) => {
