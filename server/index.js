@@ -95,6 +95,13 @@ function objInRegion(obj, x, y, width, height) {
 	)
 }
 
+function checkCollision(obj) {
+	objects.forEach((obj2, name) => {
+		if (objInRegion(obj2, obj.x, obj.y+obj.height, obj.width, obj.height+4)) return true;
+	});
+	return false
+}
+
 function Obj(x, y, width, height, mode, type) {
 	this.x = x;
 	this.y = y;
@@ -209,10 +216,7 @@ wss.on("connection", (ws, req) => {
 						if (objId !== wsId) return;
 		    		if (obj.type !== "player") return;
 
-						obj.onGround = false;
-						objects.forEach((obj2, name) => {
-							if (objInRegion(obj2, obj.x, obj.y+obj.height, region.width, region.height+4)) {obj.onGround = true;break;}
-						});
+						obj.onGround = checkCollision(obj);
 
 						let keys = data.keys;
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
