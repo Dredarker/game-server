@@ -120,10 +120,10 @@ ws.onmessage = (event) => {
 	} catch (err) {console.error(err)}
 };
 ws.onclose = (event) => {
-	if (event.code == 1006) messageToChat("Your connection is corrupted, so you're disconnected from game", "red")
-	else if (event.code == 1005) messageToChat("You closed the connection by program", "red")
-		else if (event.code == 4001) messageToChat("Server didn't expect that from you and closed the your connection", "red")
-	else messageToChat(`You're disconnected from game, code: ${event.code}`, "red");
+	if (event.code == 1006) messageToChat("Your connection is corrupted, so you're disconnected from game.", "red")
+	else if (event.code == 1005) messageToChat("You closed the connection by program.", "red")
+	else if (event.code == 4001) messageToChat("Server didn't expect that from you and closed the your connection.", "red")
+	else messageToChat(`You're disconnected from game, code: ${event.code}.`, "red");
 	messageToChat("Refreshing page will start in 3 seconds...");
 	setTimeout(() => {location.reload()}, 3000);
 };
@@ -137,6 +137,14 @@ function messageToChat(text, color) {
 function sendtows(json) {
 	if (ws.readyState != 1) return;
 	ws.send(JSON.stringify(json));
+}
+
+function drawImage(image, x, y, width, height) {
+	try {ctx.drawImage(image, x, y, width, height)}
+	catch {
+		ctx.fillStyle = "black";
+		ctx.fillRect(x, y, width, height);
+	};
 }
 
 function update() {
@@ -159,7 +167,7 @@ function draw() {
 
 	objects.forEach((obj, id) => {
 		if (obj.type === "player") {
-			ctx.drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height)
+			drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
 
 			ctx.fillStyle = "black";
 			ctx.font = "24px arial";
@@ -170,11 +178,6 @@ function draw() {
 			ctx.fillRect(obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
 		}
 	});
-
-	/*
-	ctx.fillStyle = "green";
-	ctx.fillRect(player.x-camera.x, player.y-camera.y, player.width, player.height);
-	*/
 }
 
 function gameLoop() {
