@@ -68,12 +68,10 @@ function update() {
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
-			//obj.onGround = false;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y - obj1.height;
-					obj1.onGround = true;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y + obj2.height + obj1.height;
@@ -213,13 +211,17 @@ wss.on("connection", (ws, req) => {
 						if (objId !== wsId) return;
 		    		if (obj.type !== "player") return;
 
+						obj.onGround = false;
+						objects.forEach((obj2, name) => {
+							if (objInRegion(obj2, obj.x, obj.y+obj.height, region.width, region.height+4)) {obj.onGround = true;break;}
+						});
+
 						let keys = data.keys;
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
-	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
-	      		if (keys["Space"] && !obj.onGround) {
+	      		if (keys["Space"] && obj.onGround) {
 	      			obj.vy = obj.jumpPower;
-		      		obj.onGround = true;
+		      		obj.onGround = false;
 		    		}
 		  		});
         }
@@ -243,7 +245,13 @@ wss.on("connection", (ws, req) => {
     }
 
 		if (data.type === "console") {
-			ws.send(JSON.stringify({type: "msg", msg: eval(data.msg)}))
+			ws.send(JSON.stringify({
+				type: "msg",
+				msg: {
+					let result = eval(data.msg);
+					try {JSON.stringify(result)} catch (e) {String(result)}
+				},
+			}))
 		};
   });
 
