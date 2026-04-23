@@ -78,6 +78,7 @@ const ctx = canvas.getContext("2d");
 
 const keys = {};
 const camera = {x: -500, y: -500};
+let password = "";
 
 let objects = new Map();
 
@@ -92,8 +93,11 @@ document.addEventListener("keydown", (event) => {
 		let inputvalue = document.getElementById("chatInput").value;
 		if (inputvalue.slice(0,4) == "/run") {
 			sendtows({type: "console", msg: inputvalue.slice(5)})
+		} else if (inputvalue.slice(0,5) == "/pass") {
+			password = inputvalue.slice(6);
+			messageToChat("Set console password to "+password, gray);
 		} else if (inputvalue.startsWith('/')) {
-			messageToChat("Invalid/Unknown command", "red")
+			messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
 		} else {
 			sendtows({type: "msg", text: inputvalue})
 		}
