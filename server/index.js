@@ -46,8 +46,8 @@ function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * (0.9 + 0.09 * !obj.onGround);
-			obj.vy *= 0.99;
+			obj.vx = obj.vx * (0.8 + 0.1 * !obj.onGround);
+			obj.vy *= 0.9;
 		}
 		
 		if (
@@ -103,7 +103,7 @@ function checkUnderCollision(obj) {
 	boolean = false;
 	objects.forEach((obj2, name) => {
 		if (obj !== obj2) {
-			if (objInRegion(obj2, obj.x+5, obj.y+obj.height-5, obj.width-10, obj.height+5)) boolean = true;
+			if (objInRegion(obj2, obj.x+5, obj.y+obj.height-5, obj.width-10, 10)) boolean = true;
 		}
 	});
 	return boolean;
@@ -203,7 +203,7 @@ wss.on("connection", (ws, req) => {
     					clientId,
  						}));
 						clients.get(id).nickname = data.nickname;
-						objects.set(id, new Player(data.nickname, 1.1, -11, new Obj(0, 0, 50, 50, "dynamic", "player")));
+						objects.set(id, new Player(data.nickname, 0.4, -11, new Obj(0, 0, 50, 50, "dynamic", "player")));
 						msg("", clients, `${data.nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
