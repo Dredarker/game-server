@@ -66,7 +66,8 @@
 const images = {};
 let myData = {};
 let myObject = {};
-images.player = new Image(); images.player.src = "img/player.png";
+images.source = "https://github.com/Dredarker/game-server/tree/af79dce9ff67856b8203c5908e83810004b82029/client/img";
+images.player = new Image(); images.player.src = images.source+"/player.png";
 
 const canvas = document.getElementById("gameCanvas");
 canvas.focused = true;
