@@ -49,7 +49,7 @@ function update() {
 			obj.vx *= !obj.onGround ? 0.99 : 0.8;
 			obj.vy *= 0.99;
 		}
-		
+
 		if (
 			obj.mode === "dynamic" ||
 			obj.mode === "kinetic"
@@ -145,10 +145,15 @@ function server_sync() {
 
 console.log("The game was successful initializated");
 
-setInterval(() => {
+let frames = 0;
+
+function gameLoop() {
+	frames++;
 	update();
-	server_sync();
-}, 1000 / 50);
+	if (frames % 6 == 0) server_sync();
+}
+
+setInterval(gameLoop(), 1000 / 60);
 
 // server
 wss.on("connection", (ws, req) => {
