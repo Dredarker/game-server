@@ -39,14 +39,14 @@ let gravity = 0.5;
 
 const objects = new Map();
 objects.set("bottom", new Obj(-500, 100, 1000, 100, "static", ""));
-objects.set("leftbox", new Obj(-600, 0, 100, 100, "static", ""));
-objects.set("rightbox", new Obj(500, 0, 100, 100, "static", ""));
+objects.set("leftbox", new Obj(-600, 0, 100, 200, "static", ""));
+objects.set("rightbox", new Obj(500, 0, 100, 200, "static", ""));
 
 function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx *= 0.95;
+			obj.vx = obj.vx * 0.7 + (!obj.onGround * 0.25);
 			obj.vy *= 0.95;
 		}
 		
@@ -203,7 +203,7 @@ wss.on("connection", (ws, req) => {
     					clientId,
  						}));
 						clients.get(id).nickname = data.nickname;
-						objects.set(id, new Player(data.nickname, 1, -20, new Obj(0, 0, 50, 50, "dynamic", "player")));
+						objects.set(id, new Player(data.nickname, 1, -16, new Obj(0, 0, 50, 50, "dynamic", "player")));
 						msg("", clients, `${data.nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
@@ -224,8 +224,9 @@ wss.on("connection", (ws, req) => {
 		    		if (obj.type !== "player") return;
 
 						let keys = data.keys;
-						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
-	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
+						let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
+						if (keys["KeyA"]) obj.vx += -tmpspeed;
+	      		else if (keys["KeyD"]) obj.vx += tmpspeed;
 	      		if (keys["Space"] && obj.onGround) {
 	      			obj.vy = obj.jumpPower;
 		      		obj.onGround = false;
