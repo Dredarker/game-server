@@ -153,7 +153,7 @@ function gameLoop() {
 	if (frames % 6 == 0) server_sync();
 }
 
-setInterval(gameLoop(), 1000 / 60);
+setInterval(gameLoop, 1000 / 60);
 
 // server
 wss.on("connection", (ws, req) => {
