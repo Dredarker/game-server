@@ -11,11 +11,9 @@ const bannedIps = new Set([
 ]);
 
 let HTMLclient = "No client";
-/*
 fetch('https://github.com/Dredarker/game-server/raw/refs/heads/main/client/index.html')
   .then((response) => {HTMLclient = response.text()})
   .catch(error => console.error('Ошибка загрузки клиента:', error));
-*/
 
 const server = http.createServer((req, res) => {
   if (req.url === "/") {
@@ -228,7 +226,7 @@ wss.on("connection", (ws, req) => {
       }
     }
 
-    if (data.type === "msg") msg(nickname, clients, data.text);
+    if (data.type === "msg") msg(clients.get(myid).nickname, clients, data.text);
 
     if (data.type === "getclients") {
       if (ws.readyState === WebSocket.OPEN) {
