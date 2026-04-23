@@ -258,7 +258,7 @@ wss.on("connection", (ws, req) => {
 			try {result = JSON.stringify(result)} catch (e) {result = String(result)}
 			ws.send(JSON.stringify({
 				type: "msg",
-				msg: result,
+				text: result,
 			}))
 		};
   });
