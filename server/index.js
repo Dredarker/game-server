@@ -11,9 +11,10 @@ const bannedIps = new Set([
 ]);
 
 let HTMLclient = "No client";
-fetch('https://github.com/Dredarker/game-server/raw/refs/heads/main/client/index.html')
-  .then((response) => {HTMLclient = response.text()})
-  .catch(error => console.error('Ошибка загрузки клиента:', error));
+fetch('https://raw.githubusercontent.com/Dredarker/game-server/refs/heads/main/client/index.html')
+	.then((response) => response.text())
+	.then((text) => {HTMLclient = text})
+	.catch(error => console.error('Ошибка загрузки клиента:', error));
 
 const server = http.createServer((req, res) => {
   if (req.url === "/") {
