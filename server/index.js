@@ -39,14 +39,16 @@ console.log("Initializating the game");
 const gravity = 0.5;
 
 const objects = new Map();
-objects.set("bottom", new Obj(-5000, 100, 10000, 100, "static", ""));
-objects.set("platform", new Obj(-500, 0, 100, 100, "static", ""));
+objects.set("bottom", new Obj(-500, 100, 1000, 100, "static", ""));
+objects.set("leftbox", new Obj(-600, 0, 100, 100, "static", ""));
+objects.set("leftbox", new Obj(500, 0, 100, 100, "static", ""));
 
 function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * 0.9 + 0.09 * !obj.onGround;
+			obj.vx = obj.vx * (0.9 + 0.09 * !obj.onGround);
+			obj.vx *= 0.99;
 		}
 		
 		if (
@@ -168,10 +170,6 @@ wss.on("connection", (ws, req) => {
   });
 
   console.log(`Client connected: ${clientId} (${ip})`);
-  ws.send(JSON.stringify({
-    type: "init",
-    clientId,
-  }));
 
   ws.on("message", (message) => {
     let data;
@@ -190,6 +188,10 @@ wss.on("connection", (ws, req) => {
 			if (data.type === "join") {
       	for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
+						ws.send(JSON.stringify({
+    					type: "init",
+    					clientId,
+ 						}));
 						clients.get(id).nickname = data.nickname;
 						objects.set(id, new Player(data.nickname, 1.1, -11, new Obj(0, 0, 50, 50, "dynamic", "player")));
 						msg("", clients, `${data.nickname} connected to game`);
@@ -215,9 +217,9 @@ wss.on("connection", (ws, req) => {
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
 	      		else if (keys["KeyD"]) obj.vx += obj.speed * (0.15 + obj.onGround);
 	      		obj.vx = obj.vx * (obj.onGround ? 0.8 : 1);
-	      		if (keys["Space"] && obj.onGround) {
+	      		if (keys["Space"] && !obj.onGround) {
 	      			obj.vy = obj.jumpPower;
-		      		obj.onGround = false;
+		      		obj.onGround = true;
 		    		}
 		  		});
         }
