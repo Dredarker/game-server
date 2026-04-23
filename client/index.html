@@ -95,7 +95,7 @@ document.addEventListener("keydown", (event) => {
 			sendtows({type: "console", msg: inputvalue.slice(5), password})
 		} else if (inputvalue.slice(0,5) == "/pass") {
 			password = inputvalue.slice(6);
-			messageToChat("Set console password to "+password, gray);
+			messageToChat("Set console password to "+password, "gray");
 		} else if (inputvalue.startsWith('/')) {
 			messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
 		} else {
