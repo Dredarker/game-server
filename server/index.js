@@ -35,7 +35,7 @@ const clients = new Map();
 // game
 console.log("Initializating the game");
 
-const gravity = 0.5;
+let gravity = 0.5;
 
 const objects = new Map();
 objects.set("bottom", new Obj(-500, 100, 1000, 100, "static", ""));
@@ -46,8 +46,8 @@ function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
-			obj.vx = obj.vx * (0.9 + 0.099 * !obj.onGround);
-			obj.vx *= 0.999;
+			obj.vx = obj.vx * (0.9 + 0.09 * !obj.onGround);
+			obj.vx *= 0.99;
 		}
 		
 		if (
@@ -248,7 +248,8 @@ wss.on("connection", (ws, req) => {
     }
 
 		if (data.type === "console") {
-			let result = eval(data.msg);
+			let result;
+			try {result = eval(data.msg)} catch (err) {result = err};
 			try {result = JSON.stringify(result)} catch (e) {result = String(result)}
 			ws.send(JSON.stringify({
 				type: "msg",
