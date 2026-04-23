@@ -146,11 +146,12 @@ function server_sync() {
 console.log("The game was successful initializated");
 
 let frames = 0;
+let mf = 3;
 
 function gameLoop() {
 	frames++;
 	update();
-	if (frames % 6 == 0) server_sync();
+	if (frames % mf == 0) server_sync();
 }
 
 setInterval(gameLoop, 1000 / 60);
