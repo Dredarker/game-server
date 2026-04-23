@@ -261,8 +261,10 @@ wss.on("connection", (ws, req) => {
 		if (data.type === "console") {
 			if (data.password !== process.env.console_password) ws.close(4001);
 			let result;
-			try {result = eval(data.msg)} catch (err) {result = err};
-			try {result = JSON.stringify(result)} catch (e) {result = String(result)}
+			try {
+				result = eval(data.msg);
+				try {result = JSON.stringify(result)} catch {result = String(result)};
+			} catch (err) {result = "Got error: "+err};
 			ws.send(JSON.stringify({
 				type: "msg",
 				text: result,
