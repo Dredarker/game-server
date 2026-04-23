@@ -47,7 +47,7 @@ function update() {
 		if (obj.mode === "dynamic") {
 			obj.vy += gravity;
 			obj.vx = obj.vx * (0.9 + 0.09 * !obj.onGround);
-			obj.vx *= 0.99;
+			obj.vy *= 0.99;
 		}
 		
 		if (
@@ -63,6 +63,9 @@ function update() {
 			if (obj1 == obj2) return;
 			if (obj1.mode == "static") return;
 
+			obj.onGround = false;
+			if (checkUnderCollision(obj)) obj.onGround = true;
+
 			objRealX1 = obj1.x+obj1.width/2;
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
@@ -73,7 +76,7 @@ function update() {
 					obj1.y = obj2.y - obj1.height;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
-					obj1.y = obj2.y + obj2.height + obj1.height;
+					obj1.y = obj2.y + obj2.height;
 				}
 				if (objInRegion(obj1, obj2.x, obj2.y+5, obj2.width/2, obj2.height-10)) {
 					obj1.vx = 0;
@@ -96,11 +99,14 @@ function objInRegion(obj, x, y, width, height) {
 	)
 }
 
-function checkCollision(obj) {
+function checkUnderCollision(obj) {
+	boolean = false;
 	objects.forEach((obj2, name) => {
-		if (objInRegion(obj2, obj.x, obj.y+obj.height, obj.width, obj.height+4)) return true;
+		if (obj !== obj2) {
+			if (objInRegion(obj2, obj.x+5, obj.y+obj.height-5, obj.width-10, obj.height+5)) boolean = true;
+		}
 	});
-	return false
+	return boolean;
 }
 
 function Obj(x, y, width, height, mode, type) {
@@ -216,8 +222,6 @@ wss.on("connection", (ws, req) => {
           objects.forEach((obj, objId) => {
 						if (objId !== wsId) return;
 		    		if (obj.type !== "player") return;
-
-						obj.onGround = checkCollision(obj);
 
 						let keys = data.keys;
 						if (keys["KeyA"]) obj.vx += -obj.speed * (0.15 + obj.onGround)
