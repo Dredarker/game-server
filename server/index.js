@@ -203,7 +203,7 @@ wss.on("connection", (ws, req) => {
     					clientId,
  						}));
 						clients.get(id).nickname = data.nickname;
-						objects.set(id, new Player(data.nickname, 0.4, -11, new Obj(0, 0, 50, 50, "dynamic", "player")));
+						objects.set(id, new Player(data.nickname, 1, -20, new Obj(0, 0, 50, 50, "dynamic", "player")));
 						msg("", clients, `${data.nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
