@@ -247,12 +247,11 @@ wss.on("connection", (ws, req) => {
     }
 
 		if (data.type === "console") {
+			let result = eval(data.msg);
+			try {result = JSON.stringify(result)} catch (e) {result = String(result)}
 			ws.send(JSON.stringify({
 				type: "msg",
-				msg: {
-					let result = eval(data.msg);
-					try {JSON.stringify(result)} catch (e) {String(result)}
-				},
+				msg: result,
 			}))
 		};
   });
