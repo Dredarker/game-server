@@ -1,1 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Платформер Нахуй</title>
+	<style>
+		canvas {
+			background: #ffffff;
+			display: block;
+			margin: auto;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			z-index: -999;
+		}
+		#chat {
+			background: #777777aa;
+			display: block;
+			margin: auto;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 500px;
+			height: 300px;
+		}
+		#chatBox {
+			background: #777777aa;
+			color: white;
+			display: block;
+			margin: auto;
+			position: relative;
+			width: 100%;
+			height: 264px;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+		#chatInput {
+			background: #777777;
+			color: white;
+			display: block;
+			margin: auto;
+			position: relative;
+			width: 400px;
+			height: 24px;
+		}
+		div {
+			display: block;
+			margin: auto;
+			position: relative;
+		}
+		p {
+			margin-block-start: 1px;
+			margin-block-end: 1px;
+		}
+  </style>
+</head>
+<body>
+	<canvas id="gameCanvas"></canvas>
+	<div id="chat">
+		<div id="chatBox"></div>
+		<input id="chatInput"/>
+	</div>
+</body>
 
+<script>
+const images = {};
+let myData = {};
+let myObject = {};
+images.player = new Image(); images.player.src = "img/player.png";
+
+const canvas = document.getElementById("gameCanvas");
+canvas.focused = true;
+document.getElementById("chatInput").onfocus = (e) => {canvas.focused = false};
+document.getElementById("chatInput").onblur = (e) => {canvas.focused = true};
+
+const ctx = canvas.getContext("2d");
+
+const keys = {};
+const camera = {x: -500, y: -500};
+
+let objects = new Map();
+
+document.addEventListener("keydown", (e) => {
+	if (!canvas.focused) return;
+	keys[e.code] = true;
+});
+document.addEventListener("keyup", e => keys[e.code] = false);
+
+document.addEventListener("keydown", (event) => {
+	if (event.code == "Enter") {
+		let inputvalue = document.getElementById("chatInput").value;
+		if (inputvalue.slice(0,4) == "/run") {
+			sendtows({type: "console", msg: inputvalue.slice(5)})
+		} else if (inputvalue.startsWith('/')) {
+			messageToChat("Invalid/Unknown command", "red")
+		} else {
+			sendtows({type: "msg", text: inputvalue})
+		}
+		document.getElementById("chatInput").value = "";
+	}
+});
+
+const ws = new WebSocket("wss://game-server-3k6f.onrender.com/");
+ws.onopen = (e) => {
+	sendtows({
+		type: "join",
+		nickname: "Dreder",
+	});
+	gameLoop();
+};
+ws.onmessage = (event) => {
+	let json = JSON.parse(event.data)
+	try {
+		if (json.type == "init") myData = {id: json.clientId};
+		if (json.type == "sync") objects = new Map(Object.entries(json.world));
+		if (json.type == "msg") {
+			messageToChat(`${json.from ? json.from+": " : ""} ${json.text}`);
+		};
+	} catch (err) {console.error(err)}
+};
+ws.onclose = (event) => {
+	if (event.code == 1006) messageToChat("Your connection is corrupted, so you're disconnected from game", "red")
+	else if (event.code == 1005) messageToChat("You closed the connection by program", "red")
+	else messageToChat(`You're disconnected from game, code: ${event.code}`, "red");
+	messageToChat("Refreshing page will start in 3 seconds...");
+	setTimeout(() => {location.reload()}, 3000);
+};
+
+function messageToChat(text, color) {
+	let message = document.createElement("div");
+	message.innerHTML = `<p style="color:${color ? color : "white"}">${text}</p>`;
+	document.getElementById("chatBox").append(message);
+}
+
+function sendtows(json) {
+	if (ws.readyState != 1) return;
+	ws.send(JSON.stringify(json));
+}
+
+function update() {
+	canvas.width = document.documentElement.clientWidth;
+	canvas.height = document.documentElement.clientHeight;
+	sendtows({
+		type: "sync",
+		keys,
+	});
+	objects.forEach((obj, id) => {
+		if (id === myData.id) {
+			camera.x += (((obj.x+obj.width/2)-canvas.width/2)-camera.x)/5;
+			camera.y += (((obj.y+obj.height/2)-canvas.height/2)-camera.y)/5;
+		}
+	});
+}
+
+function draw() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	objects.forEach((obj, id) => {
+		if (obj.type === "player") {
+			ctx.drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height)
+
+			ctx.fillStyle = "black";
+			ctx.font = "24px arial";
+			ctx.textAlign = "center";
+			ctx.fillText(obj.nickname, (obj.x+obj.width/2)-camera.x, (obj.y-10)-camera.y)
+		} else {
+			ctx.fillStyle = "black";
+			ctx.fillRect(obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
+		}
+	});
+
+	/*
+	ctx.fillStyle = "green";
+	ctx.fillRect(player.x-camera.x, player.y-camera.y, player.width, player.height);
+	*/
+}
+
+function gameLoop() {
+	update();
+	draw();
+	requestAnimationFrame(gameLoop);
+}
+</script>
+</html>
