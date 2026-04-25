@@ -43,6 +43,7 @@ objects.set("top", new Obj(-5000, -5000, 10000, 1000, "static", "box"));
 objects.set("bottom", new Obj(-5000, 100, 10000, 1000, "static", "box"));
 objects.set("left", new Obj(-5000, -5000, 1000, 10000, "static", "box"));
 objects.set("right", new Obj(5000, -5000, 1000, 10000, "static", "box"));
+objects.set("right", new Obj(5000, -5000, 1000, 10000, "static", "box"));
 objects.set("sign", new Obj(0, -80, 0, 30, "none", "box"));
 objects.set("text", new Text("Hello, world!", "black", new Obj(0, -50, 0, 0, "none", "text")));
 
@@ -73,7 +74,6 @@ function update() {
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
-
 
 			objRelativeX1 = objRealX1 - objRealX2;
 			objRelativeY1 = objRealY1 - objRealY2;
