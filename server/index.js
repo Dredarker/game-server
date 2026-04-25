@@ -271,21 +271,35 @@ wss.on("connection", (ws, req) => {
 
 		if (!clients.get(myid).joined) {
 			if (data.type === "join") {
-      	for (const [id, clientData] of clients.entries()) {
+				for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
+						const nickname = data.nickname;
+						if (nickname.length > 3 && nickname.length < 20) {
+							ws.close(4011);
+							return;
+						}
+
+						let editNickname = "";
+						const search = `АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!"№;%:?*()_+@#$^&-=.\\[]{}<>\`~`;
+						for (let i = 0; i < nickname.length; i++) {
+							if (!search.includes(nickname[i])) continue;
+							editNickname += nickname[i]
+						}
+						nickname = editNickname;
+
 						ws.send(JSON.stringify({
     					type: "init",
     					clientId,
  						}));
-						clients.get(id).nickname = data.nickname;
-						objects.set(id, new Player(data.nickname, 1, -16, new Obj(0, 0, 50, 50, "dynamic", "player")));
-						msg("", clients, `${data.nickname} connected to game`);
+						clients.get(id).nickname = nickname;
+						objects.set(id, new Player(nickname, 1, -16, new Obj(0, 0, 50, 50, "dynamic", "player")));
+						msg("", clients, `${nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
 					}
       	}
 			} else {
-				ws.close();
+				ws.close(4002);
 			}
     };
 
@@ -307,7 +321,13 @@ wss.on("connection", (ws, req) => {
       }
     }
 
-    if (data.type === "msg") msg(clients.get(myid).nickname, clients, data.text);
+    if (data.type === "msg") {
+			if (data.text.length < 200) {
+				msg(clients.get(myid).nickname, clients, data.text);
+			} else {
+				ws.close(4012);
+			}
+		}
 
     if (data.type === "getclients") {
       if (ws.readyState === WebSocket.OPEN) {
