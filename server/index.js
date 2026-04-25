@@ -73,21 +73,28 @@ function update() {
 			objRealY1 = obj1.y+obj1.height/2;
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
+
+
+			objRelativeX1 = objRealX1 - objRealX2;
+			objRelativeY1 = objRealY1 - objRealY2;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (newCollisionModel === true) {
-				if (objRealY1 < objRealY2) {
-					obj1.vy = 0;
-					obj1.y = obj2.y - obj1.height;
-				} else if (objRealY1 > objRealY2) {
-					obj1.vy = 0;
-					obj1.y = obj2.y + obj2.height;
-				}
-				if (objRealX1 > objRealX2) {
-					obj1.vx = 0;
-					obj1.x = obj2.x - obj1.width;
-				} else if (objRealX1 < objRealX2) {
-					obj1.vx = 0;
-					obj1.x = obj2.x + obj2.width;
+				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
+					if (objRelativeY1 > 0) {
+						obj1.vy = 0;
+						obj1.y = obj2.y - obj1.height;
+					} else {
+						obj1.vy = 0;
+						obj1.y = obj2.y + obj2.height;
+					}
+				} else {
+					if (objRelativeX1 < 0) {
+						obj1.vx = 0;
+						obj1.x = obj2.x - obj1.width;
+					} else {
+						obj1.vx = 0;
+						obj1.x = obj2.x + obj2.width;
+					}
 				}
 				} else {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
