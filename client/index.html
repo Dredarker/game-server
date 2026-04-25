@@ -222,7 +222,7 @@ gameCanvas.oncontextmenu = () => {
 gameCanvas.onclick = () => {
 	if (console_mode.mode === "build") {
 		objects.forEach((obj, id) => {
-			if (posInRegion(mouseX, mouseY, obj)) {
+			if (posInRegion(camera.x+mouseX, camera.y+mouseY, obj)) {
 				sendtows({
 					type: "console",
 					msg: `objects.delete(${id})`,
@@ -302,8 +302,8 @@ function draw() {
 	if (console_mode.mode == "build") {
 		let x = mouseX-myData.x-camera.x;
 		let y = mouseY-myData.y-camera.y;
-		x = Math.floor((x)/console_mode.width)*console_mode.width;
-		y = Math.floor((y)/console_mode.height)*console_mode.height;
+		x = Math.floor(x/console_mode.width)*console_mode.width;
+		y = Math.floor(y/console_mode.height)*console_mode.height;
 
 		ctx.fillStyle = "#00FF0033";
 		ctx.fillRect(x, y, console_mode.width, console_mode.height);
