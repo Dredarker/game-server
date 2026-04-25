@@ -145,10 +145,10 @@ document.addEventListener("keydown", (event) => {
 				localStorage.setItem("console_password", console_password);
 				messageToChat("Set console password to "+console_password, "#aaaaaa");
 			} else if (args[0] == "/mode") {
-				console_mode.mode = args[1];
+				console_mode.mode = args[1] ?? "";
 				if (console_mode.mode == "") {
 					messageToChat("Avaliable Console Modes:", "#aaaaaa");
-					messageToChat("• build", "#aaaaaa");
+					messageToChat("• build (width) (height) (objmode)", "#aaaaaa");
 					messageToChat("-------------------------------------", "#aaaaaa");
 					messageToChat("Also emptied console mode", "#aaaaaa");
 				} else {
@@ -205,7 +205,7 @@ ws.onclose = (event) => {
 };
 
 gameCanvas.oncontextmenu = () => {
-	if (console_mode === "build") {
+	if (console_mode.mode === "build") {
 		let x = camera.x+mouseX;
 		let y = camera.y+mouseY;
 		x = Math.floor((x)/100)*100;
@@ -220,7 +220,7 @@ gameCanvas.oncontextmenu = () => {
 };
 
 gameCanvas.onclick = () => {
-	if (console_mode === "build") {
+	if (console_mode.mode === "build") {
 		objects.forEach((obj, id) => {
 			if (posInRegion(mouseX, mouseY, obj)) {
 				sendtows({
@@ -298,6 +298,16 @@ function draw() {
 			ctx.fillRect(obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
 		}
 	});
+	//
+	if (console_mode.mode == "build") {
+		let x = camera.x+mouseX;
+		let y = camera.y+mouseY;
+		x = Math.floor((x)/console_mode.width)*console_mode.width;
+		y = Math.floor((y)/console_mode.height)*console_mode.height;
+
+		ctx.fillStyle = "#00FF0033";
+		ctx.fillRect(x, y, console_mode.width, console_mode.height);
+	}
 }
 
 function gameLoop() {
