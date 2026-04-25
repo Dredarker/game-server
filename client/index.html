@@ -119,7 +119,7 @@ document.getElementById("chatInput").onblur = (e) => {canvas.focused = true};
 const keys = {};
 const camera = {x: 0, y: 0};
 let console_password = localStorage.getItem("console_password") ?? "";
-let console_mode = "";
+let console_mode = {mode: ""};
 
 let mouseX = 0;
 let mouseY = 0;
@@ -135,27 +135,37 @@ document.addEventListener("keyup", e => keys[e.code] = false);
 
 document.addEventListener("keydown", (event) => {
 	if (event.code == "Enter") {
-		let inputvalue = document.getElementById("chatInput").value;
-		if (inputvalue.slice(0,4) == "/run") {
-			sendtows({type: "console", msg: inputvalue.slice(5), password: console_password})
-		} else if (inputvalue.slice(0,5) == "/pass") {
-			console_password = inputvalue.slice(6);
-			localStorage.setItem("console_password", console_password);
-			messageToChat("Set console password to "+console_password, "#aaaaaa");
-		} else if (inputvalue.slice(0,5) == "/mode") {
-			console_mode = inputvalue.slice(6);
-			if (console_mode == "") {
-				messageToChat("Avaliable Console Modes:", "#aaaaaa");
-				messageToChat("• build", "#aaaaaa");
-				messageToChat("-------------------------", "#aaaaaa");
-				messageToChat("Also emptied console mode", "#aaaaaa");
-			} else {messageToChat("Set console mode to "+console_mode, "#aaaaaa")};
-		} else if (inputvalue.startsWith('/')) {
-			messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
-		} else {
-			sendtows({type: "msg", text: inputvalue})
+		if () {
+			let inputvalue = document.getElementById("chatInput").value;
+			let args = inputvalue.split(" ");
+			if (args[0] == "/run") {
+				sendtows({type: "console", msg: inputvalue.slice(5), password: console_password})
+			} else if (args[0] == "/pass") {
+				console_password = inputvalue.slice(6);
+				localStorage.setItem("console_password", console_password);
+				messageToChat("Set console password to "+console_password, "#aaaaaa");
+			} else if (args[0] == "/mode") {
+				console_mode.mode = args[1];
+				if (console_mode.mode == "") {
+					messageToChat("Avaliable Console Modes:", "#aaaaaa");
+					messageToChat("• build", "#aaaaaa");
+					messageToChat("-------------------------------------", "#aaaaaa");
+					messageToChat("Also emptied console mode", "#aaaaaa");
+				} else {
+					if (args[1] == "build") {
+						console_mode.width = args[1];
+						console_mode.height = args[2];
+						console_mode.objmode = args[3];
+					}
+				}
+				messageToChat("Set console mode to "+console_mode, "#aaaaaa")
+			} else if (inputvalue.startsWith('/')) {
+				messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
+			} else {
+				sendtows({type: "msg", text: inputvalue})
+			}
+			document.getElementById("chatInput").value = "";
 		}
-		document.getElementById("chatInput").value = "";
 	}
 });
 
@@ -202,7 +212,7 @@ gameCanvas.oncontextmenu = () => {
 		y = Math.floor((y)/100)*100;
 		sendtows({
 			type: "console",
-			msg: `objects.set(Math.abs(Math.random() * 99999), new Obj(${x}, ${y}, 100, 100, "static", "box"))`,
+			msg: `objects.set(Math.abs(Math.random() * 99999), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, "box"))`,
 			password: console_password
 		});
 	}
