@@ -80,7 +80,7 @@ function update() {
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (newCollisionModel === true) {
 				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
-					if (objRelativeY1 > 0) {
+					if (objRelativeY1 < 0) {
 						obj1.vy = 0;
 						obj1.y = obj2.y - obj1.height;
 					} else {
