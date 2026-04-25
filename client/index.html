@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<title>Платформер Нахуй</title>
 	<style>
+		body {
+			margin: 0px;
+		}
 		canvas {
 			background: #ffffff;
 			display: block;
@@ -11,14 +14,15 @@
 			position: absolute;
 			top: 0px;
 			left: 0px;
-			z-index: -999;
+			z-index: 0;
 		}
 		#chat {
+			word-wrap: break-word;
 			background: #777777aa;
-			display: block;
-			margin: auto;
+			margin: 8px;
+			color: white;
 			position: absolute;
-			top: 0px;
+			bottom: 0px;
 			left: 0px;
 			width: 500px;
 			height: 300px;
@@ -26,9 +30,6 @@
 		#chatBox {
 			background: #777777aa;
 			color: white;
-			display: block;
-			margin: auto;
-			position: relative;
 			width: 100%;
 			height: 264px;
 			overflow-x: hidden;
@@ -37,48 +38,88 @@
 		#chatInput {
 			background: #777777;
 			color: white;
-			display: block;
-			margin: auto;
-			position: relative;
 			width: 400px;
 			height: 24px;
 		}
 		div {
 			display: block;
-			margin: auto;
 			position: relative;
 		}
+		#menu {
+			background: #777777;
+			position: absolute;
+			top: 30%;
+			display: inline-flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
 		p {
-			margin-block-start: 1px;
-			margin-block-end: 1px;
+			margin-block-start: 2px;
+			margin-block-end: 2px;
+		}
+		#title {
+			font-size: 48px;
+			font-family: arial;
 		}
   </style>
 </head>
 <body>
-	<canvas id="gameCanvas"></canvas>
-	<div id="chat">
-		<div id="chatBox"></div>
-		<input id="chatInput"/>
+	<div id="game">
+		<canvas id="gameCanvas"></canvas>
+		<div id="chat">
+			<div id="chatBox"></div>
+			<input id="chatInput"/>
+		</div>
+	</div>
+	<div id="menu">
+		<b id="title">Cubic Build</b>
+		<div>
+			<input id="nicknameInput"/>
+			<input type="button" onclick="runGame()" value="Play"/>
+		</div>
 	</div>
 </body>
 
 <script>
+nicknameInput.placeholder = "Nickname"
+
+menu.style.width = "700px";
+menu.style.height = "300px";
+menu.style.left = (document.documentElement.clientWidth/2 - parseInt(menu.style.width)/2)+"px";
+
+function runGame() {
+menu.style.display = "none";
+
 const images = {};
+images.new = (name, source) => {
+	images[name] = new Image();
+	images[name].src = images.source+source;
+}
+const sounds = {};
+sounds.new = (name, source) => {
+	sounds[name] = {};
+	sounds[name].src = sounds.source+source;
+}
+
 let myData = {};
 let myObject = {};
+
 images.source = "https://raw.githubusercontent.com/Dredarker/game-server/af79dce9ff67856b8203c5908e83810004b82029/client/img/";
-images.player = new Image(); images.player.src = images.source+"player.png";
+images.new("player", "player.png");
+sounds.source = "https://raw.githubusercontent.com/Dredarker/game-server/af79dce9ff67856b8203c5908e83810004b82029/client/snd/";
+
 
 const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
 canvas.focused = true;
 document.getElementById("chatInput").onfocus = (e) => {canvas.focused = false};
 document.getElementById("chatInput").onblur = (e) => {canvas.focused = true};
 
-const ctx = canvas.getContext("2d");
-
 const keys = {};
-const camera = {x: -500, y: -500};
-let password = "";
+const camera = {x: 0, y: 0};
+let console_password = localStorage.getItem("console_password") ?? "";
 
 let objects = new Map();
 
@@ -92,10 +133,11 @@ document.addEventListener("keydown", (event) => {
 	if (event.code == "Enter") {
 		let inputvalue = document.getElementById("chatInput").value;
 		if (inputvalue.slice(0,4) == "/run") {
-			sendtows({type: "console", msg: inputvalue.slice(5), password})
+			sendtows({type: "console", msg: inputvalue.slice(5), password: console_password})
 		} else if (inputvalue.slice(0,5) == "/pass") {
-			password = inputvalue.slice(6);
-			messageToChat("Set console password to "+password, "gray");
+			console_password = inputvalue.slice(6);
+			localStorage.setItem("console_password", console_password);
+			messageToChat("Set console password to "+console_password, "#aaaaaa");
 		} else if (inputvalue.startsWith('/')) {
 			messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
 		} else {
@@ -109,7 +151,7 @@ const ws = new WebSocket("wss://game-server-3k6f.onrender.com/");
 ws.onopen = (e) => {
 	sendtows({
 		type: "join",
-		nickname: "Dreder",
+		nickname: document.getElementById("nicknameInput").value,
 	});
 	gameLoop();
 };
@@ -132,9 +174,9 @@ ws.onclose = (event) => {
 	setTimeout(() => {location.reload()}, 3000);
 };
 
-function messageToChat(text, color) {
+function messageToChat(text, color = "white") {
 	let message = document.createElement("div");
-	message.innerHTML = `<p style="color:${color ? color : "white"}">${text}</p>`;
+	message.innerHTML = `<p style="color:${color}">${text}</p>`;
 	document.getElementById("chatBox").append(message);
 }
 
@@ -154,6 +196,7 @@ function drawImage(image, x, y, width, height) {
 function update() {
 	canvas.width = document.documentElement.clientWidth;
 	canvas.height = document.documentElement.clientHeight;
+	document.getElementById("chat").style.bottom = -document.getElementById("gameCanvas").height+"px";
 	sendtows({
 		type: "sync",
 		keys,
@@ -177,6 +220,11 @@ function draw() {
 			ctx.font = "24px arial";
 			ctx.textAlign = "center";
 			ctx.fillText(obj.nickname, (obj.x+obj.width/2)-camera.x, (obj.y-10)-camera.y)
+		} else if (obj.type === "text") {
+			ctx.fillStyle = obj.textColor;
+			ctx.font = "20px arial";
+			ctx.textAlign = "center";
+			ctx.fillText(obj.text, obj.x-camera.x, obj.y-camera.y)
 		} else {
 			ctx.fillStyle = "black";
 			ctx.fillRect(obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
@@ -188,6 +236,7 @@ function gameLoop() {
 	update();
 	draw();
 	requestAnimationFrame(gameLoop);
+}
 }
 </script>
 </html>
