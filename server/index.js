@@ -223,7 +223,7 @@ wss.on("connection", (ws, req) => {
     if (data.type === "sync") {
       if (ws.readyState === WebSocket.OPEN) {
         objects.forEach((obj, objId) => {
-					if (objId === myId) {
+					if (objId === myid) {
 						let keys = data.keys;
 						let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
 
