@@ -274,7 +274,7 @@ wss.on("connection", (ws, req) => {
 				for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
 						let nickname = data.nickname;
-						if (nickname.length > 3 && nickname.length < 20) {
+						if (!(nickname.length > 3 && nickname.length < 20)) {
 							ws.close(4011);
 							return;
 						}
