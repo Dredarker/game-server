@@ -208,8 +208,8 @@ gameCanvas.oncontextmenu = () => {
 	if (console_mode.mode === "build") {
 		let x = camera.x+mouseX;
 		let y = camera.y+mouseY;
-		x = Math.floor((x)/100)*100;
-		y = Math.floor((y)/100)*100;
+		x = Math.floor((x)/console_mode.width)*console_mode.width;
+		y = Math.floor((y)/console_mode.height)*console_mode.height;
 		sendtows({
 			type: "console",
 			msg: `objects.set(Math.abs(Math.random() * 99999), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, "box"))`,
