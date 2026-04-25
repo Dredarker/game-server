@@ -39,13 +39,8 @@ let gravity = 0.5;
 let newCollisionModel = false;
 
 const objects = new Map();
-objects.set("top", new Obj(-5000, -5000, 10000, 1000, "static", "box"));
-objects.set("bottom", new Obj(-5000, 100, 10000, 1000, "static", "box"));
-objects.set("left", new Obj(-5000, -5000, 1000, 10000, "static", "box"));
-objects.set("right", new Obj(5000, -5000, 1000, 10000, "static", "box"));
-objects.set("right", new Obj(5000, -5000, 1000, 10000, "static", "box"));
-objects.set("sign", new Obj(0, -80, 0, 30, "none", "box"));
-objects.set("text", new Text("Hello, world!", "black", new Obj(0, -50, 0, 0, "none", "text")));
+objects.set("bottom", new Obj(0, 100, 100, 100, "static", "box"));
+objects.set("text", new Text("Spawn", "black", new Obj(0, -50, 0, 0, "none", "text")));
 
 function update() {
 	objects.forEach((obj, name) => {
