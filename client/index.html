@@ -300,8 +300,8 @@ function draw() {
 	});
 	//
 	if (console_mode.mode == "build") {
-		let x = camera.x+mouseX;
-		let y = camera.y+mouseY;
+		let x = mouseX-myData.x-camera.x;
+		let y = mouseY-myData.y-camera.y;
 		x = Math.floor((x)/console_mode.width)*console_mode.width;
 		y = Math.floor((y)/console_mode.height)*console_mode.height;
 
