@@ -226,8 +226,10 @@ wss.on("connection", (ws, req) => {
         if (client !== ws) continue;
         if (client.readyState === WebSocket.OPEN) {
           objects.forEach((obj, objId) => {
-						if (objId !== wsId) continue;
-		    		if (obj.type !== "player") continue;
+						if (
+							objId !== wsId ||
+							obj.type !== "player"
+						) break;
 
 						let keys = data.keys;
 						let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
