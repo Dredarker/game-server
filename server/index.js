@@ -193,10 +193,10 @@ function server_sync() {
 		if (!clientData.joined) return;
   	const client = clientData.ws;
   	if (client.readyState === WebSocket.OPEN) {
-  	  client.send(JSON.stringify({
-	      type: "sync",
+			client.send(JSON.stringify({
+				type: "sync",
 				world: Object.fromEntries(objects)
-	    }));
+			}));
 	  }
 	}
 }
