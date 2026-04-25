@@ -63,7 +63,7 @@ function update() {
 			if (obj2.mode == "none") return;
 
 			obj.onGround = false;
-			if (checkUnderCollision(obj)) obj.onGround = true;
+			if (checkUnderCollision(obj) && obj1.mode != "none") obj.onGround = true;
 
 			objRealX1 = obj1.x+obj1.width/2;
 			objRealY1 = obj1.y+obj1.height/2;
