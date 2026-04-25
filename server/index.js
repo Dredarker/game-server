@@ -43,15 +43,13 @@ objects.set("top", new Obj(-5000, -5000, 10000, 1000, "static", "box"));
 objects.set("bottom", new Obj(-5000, 100, 10000, 1000, "static", "box"));
 objects.set("left", new Obj(-5000, -5000, 1000, 10000, "static", "box"));
 objects.set("right", new Obj(5000, -5000, 1000, 10000, "static", "box"));
-objects.set("text", new Text("Hello, world!", "white", new Obj(500, 0, 100, 200, "static", "text")));
+objects.set("text", new Text("Hello, world!", "black", new Obj(0, -200, 0, 0, "none", "text")));
 
 function update() {
 	objects.forEach((obj, name) => {
-		if (obj.mode === "dynamic") {
-			obj.vy += gravity;
-			obj.vx *= !obj.onGround ? 0.99 : 0.8;
-			obj.vy *= 0.99;
-		}
+		if (obj.mode === "dynamic") obj.vy += gravity;
+		obj.vx *= !obj.onGround ? 0.99 : 0.8;
+		obj.vy *= 0.99;
 
 		if (
 			obj.mode === "dynamic" ||
@@ -64,7 +62,8 @@ function update() {
 		objects.forEach((obj2, name) => {
 			let obj1 = obj;
 			if (obj1 == obj2) return;
-			if (obj1.mode == "static") return;
+			if (obj1.mode == "static" || obj2.mode == "none") return;
+			if (obj2.mode == "none") return;
 
 			obj.onGround = false;
 			if (checkUnderCollision(obj)) obj.onGround = true;
@@ -78,37 +77,45 @@ function update() {
 			objRelativeX1 = objRealX1 - objRealX2;
 			objRelativeY1 = objRealY1 - objRealY2;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
-				if (newCollisionModel === true) {
+				if (newCollisionModel) {
 				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
 					if (objRelativeY1 < 0) {
-						obj1.vy = 0;
+						obj2.vy = obj1.vy;
+						obj1.vy /= 4;
 						obj1.y = obj2.y - obj1.height;
 					} else {
-						obj1.vy = 0;
+						obj2.vy = obj1.vy;
+						obj1.vy /= 4;
 						obj1.y = obj2.y + obj2.height;
 					}
 				} else {
 					if (objRelativeX1 < 0) {
-						obj1.vx = 0;
+						obj2.vx = obj1.vx;
+						obj1.vx /= 4;
 						obj1.x = obj2.x - obj1.width;
 					} else {
-						obj1.vx = 0;
+						obj2.vx = obj1.vx;
+						obj1.vx /= 4;
 						obj1.x = obj2.x + obj2.width;
 					}
 				}
 				} else {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
-					obj1.vy = 0;
+					obj2.vy = obj1.vy;
+					obj1.vy /= 4;
 					obj1.y = obj2.y - obj1.height;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
-					obj1.vy = 0;
+					obj2.vy = obj1.vy;
+					obj1.vy /= 4;
 					obj1.y = obj2.y + obj2.height;
 				}
 				if (objInRegion(obj1, obj2.x, obj2.y+5, obj2.width/2, obj2.height-10)) {
-					obj1.vx = 0;
+					obj2.vx = obj1.vx;
+					obj1.vx /= 4;
 					obj1.x = obj2.x - obj1.width;
 				} else if (objInRegion(obj1, obj2.x+obj2.width/2, obj2.y+5, obj2.width/2, obj2.height-10)) {
-					obj1.vx = 0;
+					obj2.vx = obj1.vx;
+					obj1.vx /= 4;
 					obj1.x = obj2.x + obj2.width;
 				}
 				}
