@@ -221,27 +221,20 @@ wss.on("connection", (ws, req) => {
     };
 
     if (data.type === "sync") {
-      for (const [wsId, clientData] of clients.entries()) {
-				let client = clientData.ws;
-        if (client !== ws) continue;
-        if (client.readyState === WebSocket.OPEN) {
-          objects.forEach((obj, objId) => {
-						if (
-							objId === wsId ||
-							obj.type === "player"
-						) {
-							let keys = data.keys;
-							let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
+      if (ws.readyState === WebSocket.OPEN) {
+        objects.forEach((obj, objId) => {
+					if (objId === myId) {
+						let keys = data.keys;
+						let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
 
-							if (keys["KeyA"]) obj.vx += -tmpspeed;
-	      			else if (keys["KeyD"]) obj.vx += tmpspeed;
-	      			if (keys["Space"] && obj.onGround) {
-	      				obj.vy = obj.jumpPower;
-		      			obj.onGround = false;
-		    			}
-						}
-		  		});
-        }
+						if (keys["KeyA"]) obj.vx += -tmpspeed;
+	      		else if (keys["KeyD"]) obj.vx += tmpspeed;
+	      		if (keys["Space"] && obj.onGround) {
+	      			obj.vy = obj.jumpPower;
+		      		obj.onGround = false;
+		    		}
+					}
+		  	});
       }
     }
 
