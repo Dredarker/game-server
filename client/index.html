@@ -195,7 +195,7 @@ ws.onclose = (event) => {
 };
 
 gameCanvas.oncontextmenu = () => {
-	if (mode === "build") {
+	if (console_mode === "build") {
 		let x = camera.x+mouseX;
 		let y = camera.y+mouseY;
 		x = Math.floor((x)/100)*100;
@@ -210,7 +210,7 @@ gameCanvas.oncontextmenu = () => {
 };
 
 gameCanvas.onclick = () => {
-	if (mode === "build") {
+	if (console_mode === "build") {
 		objects.forEach((obj, id) => {
 			if (posInRegion(mouseX, mouseY, obj)) {
 				sendtows({
