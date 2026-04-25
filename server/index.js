@@ -40,7 +40,7 @@ let newCollisionModel = false;
 
 const objects = new Map();
 objects.set("bottom", new Obj(0, 100, 100, 100, "static", "box"));
-objects.set("text", new Text("Spawn", "black", new Obj(0, -50, 0, 0, "none", "text")));
+objects.set("text", new Text("Spawn", "black", new Obj(50, -100, 0, 0, "none", "text")));
 
 function update() {
 	objects.forEach((obj, name) => {
