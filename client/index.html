@@ -302,8 +302,8 @@ function draw() {
 	if (console_mode.mode == "build") {
 		let x = mouseX;
 		let y = mouseY;
-		x = Math.floor(x/console_mode.width-camera.x)*console_mode.width;
-		y = Math.floor(y/console_mode.height-camera.y)*console_mode.height;
+		x = Math.floor(x/console_mode.width)*console_mode.width;
+		y = Math.floor(y/console_mode.height)*console_mode.height;
 
 		ctx.fillStyle = "#00000044";
 		ctx.fillRect(x, y, console_mode.width, console_mode.height);
