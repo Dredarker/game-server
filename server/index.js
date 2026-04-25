@@ -110,6 +110,8 @@ function update() {
 	});
 }
 
+let customUpdate = () => {};
+
 function objInRegion(obj, x, y, width, height) {
 	return (
 		obj.x < x + width &&
@@ -175,15 +177,21 @@ console.log("The game was successful initializated");
 
 let frames = 0;
 let framestosync = 3;
+let iferrorframestotryagain = 0;
+let fps = 60;
 
 function gameLoop() {
 	frames++;
 	update();
-	customUpdate();
+
+	if (iferrorframestotryagain <= 0) {
+		try {customUpdate()} catch (err) {iferrorframestotryagain = 15*fps; msg("", clients, err)}
+	} else iferrorframestotryagain--;
+
 	if (frames % framestosync == 0) server_sync();
 }
 
-setInterval(gameLoop, 1000 / 60);
+setInterval(gameLoop, 1000 / fps);
 
 // server
 wss.on("connection", (ws, req) => {
