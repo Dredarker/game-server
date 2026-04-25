@@ -273,7 +273,7 @@ wss.on("connection", (ws, req) => {
 			if (data.type === "join") {
 				for (const [id, clientData] of clients.entries()) {
 					if (clientData.ws === ws) {
-						const nickname = data.nickname;
+						let nickname = data.nickname;
 						if (nickname.length > 3 && nickname.length < 20) {
 							ws.close(4011);
 							return;
@@ -283,7 +283,7 @@ wss.on("connection", (ws, req) => {
 						const search = `АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!"№;%:?*()_+@#$^&-=.\\[]{}<>\`~`;
 						for (let i = 0; i < nickname.length; i++) {
 							if (!search.includes(nickname[i])) continue;
-							editNickname += nickname[i]
+							editNickname += nickname[i];
 						}
 						nickname = editNickname;
 
