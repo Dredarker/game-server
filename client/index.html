@@ -285,7 +285,7 @@ function draw() {
 			drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
 
 			ctx.fillStyle = "black";
-			ctx.font = "24px arial";
+			ctx.font = "20px arial";
 			ctx.textAlign = "center";
 			ctx.fillText(obj.nickname, (obj.x+obj.width/2)-camera.x, (obj.y-10)-camera.y)
 		} else if (obj.type === "text") {
@@ -300,12 +300,12 @@ function draw() {
 	});
 	//
 	if (console_mode.mode == "build") {
-		let x = mouseX-myData.x-camera.x;
-		let y = mouseY-myData.y-camera.y;
-		x = Math.floor(x/console_mode.width)*console_mode.width;
-		y = Math.floor(y/console_mode.height)*console_mode.height;
+		let x = mouseX;
+		let y = mouseY;
+		x = Math.floor(x/console_mode.width-camera.x)*console_mode.width;
+		y = Math.floor(y/console_mode.height-camera.y)*console_mode.height;
 
-		ctx.fillStyle = "#00FF0033";
+		ctx.fillStyle = "#00000044";
 		ctx.fillRect(x, y, console_mode.width, console_mode.height);
 	}
 }
