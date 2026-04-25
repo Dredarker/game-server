@@ -36,11 +36,14 @@ const clients = new Map();
 console.log("Initializating the game");
 
 let gravity = 0.5;
+let newCollisionModel = false;
 
 const objects = new Map();
-objects.set("bottom", new Obj(-500, 100, 1000, 100, "static", ""));
-objects.set("leftbox", new Obj(-600, 0, 100, 200, "static", ""));
-objects.set("rightbox", new Obj(500, 0, 100, 200, "static", ""));
+objects.set("top", new Obj(-5000, -5000, 10000, 1000, "static", "box"));
+objects.set("bottom", new Obj(-5000, 100, 10000, 1000, "static", "box"));
+objects.set("left", new Obj(-5000, -5000, 1000, 10000, "static", "box"));
+objects.set("right", new Obj(5000, -5000, 1000, 10000, "static", "box"));
+objects.set("text", new Text("Hello, world!", "white", new Obj(500, 0, 100, 200, "static", "text")));
 
 function update() {
 	objects.forEach((obj, name) => {
@@ -71,6 +74,22 @@ function update() {
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
+				if (newCollisionModel === true) {
+				if (objRealY1 < objRealY2) {
+					obj1.vy = 0;
+					obj1.y = obj2.y - obj1.height;
+				} else if (objRealY1 > objRealY2) {
+					obj1.vy = 0;
+					obj1.y = obj2.y + obj2.height;
+				}
+				if (objRealX1 > objRealX2) {
+					obj1.vx = 0;
+					obj1.x = obj2.x - obj1.width;
+				} else if (objRealX1 < objRealX2) {
+					obj1.vx = 0;
+					obj1.x = obj2.x + obj2.width;
+				}
+				} else {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
 					obj1.vy = 0;
 					obj1.y = obj2.y - obj1.height;
@@ -84,6 +103,7 @@ function update() {
 				} else if (objInRegion(obj1, obj2.x+obj2.width/2, obj2.y+5, obj2.width/2, obj2.height-10)) {
 					obj1.vx = 0;
 					obj1.x = obj2.x + obj2.width;
+				}
 				}
 			}
 		});
@@ -130,6 +150,14 @@ function Player(nickname, speed, jumpPower, obj) {
 	this.jumpPower = jumpPower;
 }
 
+function Text(text, textColor, obj) {
+	for (let i in obj) {
+		this[i] = obj[i]
+	}
+	this.text = text;
+	this.textColor = textColor;
+}
+
 function server_sync() {
 	for (const [id, clientData] of clients.entries()) {
 		if (!clientData.joined) return;
@@ -146,12 +174,13 @@ function server_sync() {
 console.log("The game was successful initializated");
 
 let frames = 0;
-let mf = 3;
+let framestosync = 3;
 
 function gameLoop() {
 	frames++;
 	update();
-	if (frames % mf == 0) server_sync();
+	customUpdate();
+	if (frames % framestosync == 0) server_sync();
 }
 
 setInterval(gameLoop, 1000 / 60);
