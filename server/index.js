@@ -174,6 +174,20 @@ function Text(text, textColor, obj) {
 	this.textColor = textColor;
 }
 
+function msg(from, to, text) {
+	for (const [id, clientData] of to.entries()) {
+  	const client = clientData.ws;
+  	if (client.readyState === WebSocket.OPEN) {
+  	  client.send(JSON.stringify({
+	      type: "msg",
+	      from,
+	      text,
+	      ip: (clientData.ip == adminIp ? clients.get(clientId).ip : "none"),
+	    }));
+		}
+	}
+}
+
 function server_sync() {
 	for (const [id, clientData] of clients.entries()) {
 		if (!clientData.joined) return;
@@ -199,7 +213,10 @@ function gameLoop() {
 	update();
 
 	if (iferrorframestotryagain <= 0) {
-		try {customUpdate()} catch (err) {iferrorframestotryagain = 15*fps; msg("", clients, err)}
+		try {customUpdate()} catch (err) {
+			iferrorframestotryagain = 15*fps;
+			msg("", clients, err);
+		}
 	} else iferrorframestotryagain--;
 
 	if (frames % framestosync == 0) server_sync();
@@ -329,20 +346,6 @@ wss.on("connection", (ws, req) => {
   ws.on("error", (err) => {
   	console.error(`Error (${clientId}, ${ip}):`, err);
  	});
-
-	function msg(from, to, text) {
-		for (const [id, clientData] of to.entries()) {
-  	  const client = clientData.ws;
-  	  if (client.readyState === WebSocket.OPEN) {
-  	    client.send(JSON.stringify({
-	        type: "msg",
-	        from,
-	        text,
-	        ip: (clientData.ip == adminIp ? clients.get(clientId).ip : "none"),
-	      }));
-	    }
-	  }
-	}
 });
 
 server.listen(PORT, () => {
