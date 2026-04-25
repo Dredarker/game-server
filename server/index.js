@@ -223,14 +223,15 @@ wss.on("connection", (ws, req) => {
     if (data.type === "sync") {
       for (const [wsId, clientData] of clients.entries()) {
 				let client = clientData.ws;
-        if (client !== ws) return;
+        if (client !== ws) continue;
         if (client.readyState === WebSocket.OPEN) {
           objects.forEach((obj, objId) => {
-						if (objId !== wsId) return;
-		    		if (obj.type !== "player") return;
+						if (objId !== wsId) continue;
+		    		if (obj.type !== "player") continue;
 
 						let keys = data.keys;
 						let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
+
 						if (keys["KeyA"]) obj.vx += -tmpspeed;
 	      		else if (keys["KeyD"]) obj.vx += tmpspeed;
 	      		if (keys["Space"] && obj.onGround) {
