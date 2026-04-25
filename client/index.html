@@ -102,13 +102,12 @@ sounds.new = (name, source) => {
 	sounds[name].src = sounds.source+source;
 }
 
-let myData = {};
-let myObject = {};
+const myData = {id: "", x: 0, y: 0};
+const myObject = {};
 
 images.source = "https://raw.githubusercontent.com/Dredarker/game-server/af79dce9ff67856b8203c5908e83810004b82029/client/img/";
 images.new("player", "player.png");
 sounds.source = "https://raw.githubusercontent.com/Dredarker/game-server/af79dce9ff67856b8203c5908e83810004b82029/client/snd/";
-
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -120,6 +119,11 @@ document.getElementById("chatInput").onblur = (e) => {canvas.focused = true};
 const keys = {};
 const camera = {x: 0, y: 0};
 let console_password = localStorage.getItem("console_password") ?? "";
+let console_mode = "";
+
+let mouseX = 0;
+let mouseY = 0;
+document.onmousemove = () => {mouseX = event.clientX; mouseY = event.clientY}
 
 let objects = new Map();
 
@@ -138,6 +142,14 @@ document.addEventListener("keydown", (event) => {
 			console_password = inputvalue.slice(6);
 			localStorage.setItem("console_password", console_password);
 			messageToChat("Set console password to "+console_password, "#aaaaaa");
+		} else if (inputvalue.slice(0,5) == "/mode") {
+			console_mode = inputvalue.slice(6);
+			if (console_mode == "") {
+				messageToChat("Avaliable Console Modes:", "#aaaaaa");
+				messageToChat("• build", "#aaaaaa");
+				messageToChat("");
+				messageToChat("Also emptied console mode", "#aaaaaa");
+			} else {messageToChat("Set console mode to "+console_mode, "#aaaaaa")};
 		} else if (inputvalue.startsWith('/')) {
 			messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
 		} else {
@@ -158,8 +170,16 @@ ws.onopen = (e) => {
 ws.onmessage = (event) => {
 	let json = JSON.parse(event.data)
 	try {
-		if (json.type == "init") myData = {id: json.clientId};
-		if (json.type == "sync") objects = new Map(Object.entries(json.world));
+		if (json.type == "init") myData.id = json.clientId;
+		if (json.type == "sync") {
+			objects = new Map(Object.entries(json.world));
+			objects.forEach((obj, id) => {
+				if (id === myData.id) {
+					myData.x = obj.x;
+					myData.y = obj.y;
+				}
+			});
+		}
 		if (json.type == "msg") {
 			messageToChat(`${json.from ? json.from+": " : ""} ${json.text}`);
 		};
@@ -174,9 +194,46 @@ ws.onclose = (event) => {
 	setTimeout(() => {location.reload()}, 3000);
 };
 
+gameCanvas.oncontextmenu = () => {
+	if (mode === "build") {
+		let x = camera.x+mouseX;
+		let y = camera.y+mouseY;
+		x = Math.floor((x)/100)*100;
+		y = Math.floor((y)/100)*100;
+		sendtows({
+			type: "console",
+			msg: `objects.set(Math.abs(Math.random() * 99999), new Obj(${x}, ${y}, 100, 100, "static", "box"))`,
+			password: console_password
+		});
+	}
+};
+
+gameCanvas.onclick = () => {
+	if (mode === "build") {
+		objects.forEach((obj, id) => {
+			if (posInRegion(mouseX, mouseY, obj)) {
+				sendtows({
+					type: "console",
+					msg: `objects.delete(${id})`,
+					password: console_password
+				});
+			}
+		});
+	}
+};
+
+function posInRegion(x, y, obj) {
+	return (
+		x < obj.x + obj.width &&
+		x > obj.x &&
+		y < obj.y + obj.height &&
+		y > obj.y
+	)
+}
+
 function messageToChat(text, color = "white") {
 	let message = document.createElement("div");
-	message.innerHTML = `<p style="color:${color}">${text}</p>`;
+	message.innerHTML = "<p style='color:"+color+"'>"+text+"</p>";
 	document.getElementById("chatBox").append(message);
 }
 
