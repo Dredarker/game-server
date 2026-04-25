@@ -135,7 +135,7 @@ document.addEventListener("keyup", e => keys[e.code] = false);
 
 document.addEventListener("keydown", (event) => {
 	if (event.code == "Enter") {
-		if (canvas.focused) {
+		if (!canvas.focused) {
 			let inputvalue = document.getElementById("chatInput").value;
 			let args = inputvalue.split(" ");
 			if (args[0] == "/run") {
