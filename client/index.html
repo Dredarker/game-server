@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 	<meta charset="UTF-8">
-	<title>Платформер Нахуй</title>
+	<title>Cubic Build</title>
 	<style>
 		body {
 			margin: 0px;
@@ -45,6 +45,8 @@
 			display: block;
 			position: relative;
 		}
+		.inline {display: inline-block}
+		.block {display: block}
 		#menu {
 			background: #777777;
 			position: absolute;
@@ -55,8 +57,12 @@
 			align-items: center;
 		}
 		p {
+			font-family: arial;
 			margin-block-start: 2px;
 			margin-block-end: 2px;
+		}
+		a {
+			font-family: arial;
 		}
 		#title {
 			font-size: 48px;
@@ -74,19 +80,32 @@
 	</div>
 	<div id="menu">
 		<b id="title">Cubic Build</b>
-		<div>
-			<input id="nicknameInput"/>
-			<input type="button" onclick="runGame()" value="Play"/>
+		<div class="block">
+			<div id="left" class="inline">
+				<div class="block">
+					<input id="nicknameInput"/>
+					<input id="colorInput" type="color"/>
+				</div>
+				<div class="block">
+					<input type="button" onclick="runGame()" value="Play"/>
+				</div>
+			</div>
+			<div id="right" class="inline">
+				<p>Our community</p>
+				<a href="https://discord.gg/eQyezGmJHT">Discord</a>
+			</div>
 		</div>
 	</div>
 </body>
 
 <script>
-nicknameInput.placeholder = "Nickname"
+nicknameInput.placeholder = "Nickname";
 
 menu.style.width = "700px";
 menu.style.height = "300px";
 menu.style.left = (document.documentElement.clientWidth/2 - parseInt(menu.style.width)/2)+"px";
+
+chatInput.maxLength = 200;
 
 function runGame() {
 menu.style.display = "none";
@@ -137,6 +156,7 @@ document.addEventListener("keydown", (event) => {
 	if (event.code == "Enter") {
 		if (!canvas.focused) {
 			let inputvalue = document.getElementById("chatInput").value;
+			if (inputvalue === "") return;
 			let args = inputvalue.split(" ");
 			if (args[0] == "/run") {
 				sendtows({type: "console", msg: inputvalue.slice(5), password: console_password})
@@ -157,8 +177,8 @@ document.addEventListener("keydown", (event) => {
 						console_mode.height = args[3];
 						console_mode.objmode = args[4];
 					}
+					messageToChat(`Set console mode to ${console_mode.mode}`, "#aaaaaa")
 				}
-				messageToChat(`Set console mode to ${console_mode.mode}`, "#aaaaaa")
 			} else if (inputvalue.startsWith('/')) {
 				messageToChat(`Invalid/Unknown command "${inputvalue}"`, "red")
 			} else {
@@ -174,6 +194,7 @@ ws.onopen = (e) => {
 	sendtows({
 		type: "join",
 		nickname: document.getElementById("nicknameInput").value,
+		color: colorInput.value,
 	});
 	gameLoop();
 };
@@ -200,20 +221,19 @@ ws.onclose = (event) => {
 	else if (event.code == 1005) messageToChat("You closed the connection by program.", "red")
 	else if (event.code == 4001) messageToChat("Server didn't expect that from you and closed the your connection.", "red")
 	else messageToChat(`You're disconnected from game, code: ${event.code}.`, "red");
-	messageToChat("Refreshing page will start in 3 seconds...");
-	setTimeout(() => {location.reload()}, 3000);
+	messageToChat("Refreshing page will start in 5 seconds...", "red");
+	setTimeout(() => {location.reload()}, 5000);
 };
 
 gameCanvas.oncontextmenu = () => {
 	if (console_mode.mode === "build") {
-		let x = camera.x+mouseX;
-		let y = camera.y+mouseY;
-		let minSize = Math.min(console_mode.width, console_mode.height);
-		x = Math.floor(x / console_mode.width) * minSize;
-		y = Math.floor(y / console_mode.height) * minSize;
+		let x = camera.x + mouseX;
+		let y = camera.y + mouseY;
+		x = Math.floor(x / console_mode.width) * console_mode.width;
+		y = Math.floor(y / console_mode.height) * console_mode.height;
 		sendtows({
 			type: "console",
-			msg: `objects.set(String(Math.abs(Math.random() * 99999)), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, "box"))`,
+			msg: `objects.set(Math.floor(Math.random() * 100000), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, "box"))`,
 			password: console_password
 		});
 	}
@@ -223,10 +243,11 @@ gameCanvas.oncontextmenu = () => {
 gameCanvas.onclick = () => {
 	if (console_mode.mode === "build") {
 		objects.forEach((obj, id) => {
-			if (posInRegion(camera.x+mouseX, camera.y+mouseY, obj)) {
+			if (posInObj(camera.x+mouseX, camera.y+mouseY, obj)) {
+				console.log(id);
 				sendtows({
 					type: "console",
-					msg: `objects.delete(${String(id)})`,
+					msg: `objects.delete(${id})`,
 					password: console_password
 				});
 			}
@@ -234,7 +255,7 @@ gameCanvas.onclick = () => {
 	}
 };
 
-function posInRegion(x, y, obj) {
+function posInObj(x, y, obj) {
 	return (
 		x < obj.x + obj.width &&
 		x > obj.x &&
@@ -247,6 +268,7 @@ function messageToChat(text, color = "white") {
 	let message = document.createElement("div");
 	message.innerHTML = "<p style='color:"+color+"'>"+text+"</p>";
 	document.getElementById("chatBox").append(message);
+	chatBox.scrollTop = 999999999;
 }
 
 function sendtows(json) {
@@ -254,9 +276,12 @@ function sendtows(json) {
 	ws.send(JSON.stringify(json));
 }
 
-function drawImage(image, x, y, width, height) {
-	try {ctx.drawImage(image, x, y, width, height)}
-	catch {
+function drawImage(image, x, y, width, height, color) {
+	try {
+		ctx.drawImage(image, x, y, width, height);
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, width, height);
+	} catch {
 		ctx.fillStyle = "black";
 		ctx.fillRect(x, y, width, height);
 	};
@@ -283,9 +308,9 @@ function draw() {
 
 	objects.forEach((obj, id) => {
 		if (obj.type === "player") {
-			drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
+			drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height, `${obj.color}80`);
 
-			ctx.fillStyle = "black";
+			ctx.fillStyle = obj.color;
 			ctx.font = "20px arial";
 			ctx.textAlign = "center";
 			ctx.fillText(obj.nickname, (obj.x+obj.width/2)-camera.x, (obj.y-10)-camera.y)
@@ -295,19 +320,23 @@ function draw() {
 			ctx.textAlign = "center";
 			ctx.fillText(obj.text, obj.x-camera.x, obj.y-camera.y)
 		} else {
-			ctx.fillStyle = "black";
+			ctx.fillStyle = obj.color;
 			ctx.fillRect(obj.x-camera.x, obj.y-camera.y, obj.width, obj.height);
 		}
 	});
-	//
+
 	if (console_mode.mode == "build") {
 		let x = mouseX;
 		let y = mouseY;
-		x = Math.floor(x/console_mode.width)*console_mode.width;
-		y = Math.floor(y/console_mode.height)*console_mode.height;
+		/*
+		let x = Math.floor(mouseX / console_mode.width) * console_mode.width;
+		let y = Math.floor(mouseY / console_mode.height) * console_mode.height;
+		*/
 
-		ctx.fillStyle = "#00000044";
-		ctx.fillRect(x, y, console_mode.width, console_mode.height);
+		ctx.fillStyle = "#000000";
+		ctx.fillRect(x, y, 10, 10);
+		ctx.fillStyle = "#00000040";
+		ctx.fillRect(x+10, y+10, console_mode.width/2, console_mode.height/2);
 	}
 }
 
