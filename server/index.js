@@ -36,7 +36,7 @@ const clients = new Map();
 console.log("Initializating the game");
 
 let gravity = 0.5;
-let newCollisionModel = false;
+let newCollisionModel = true;
 
 const objects = new Map();
 objects.set("bottom", new Obj(-50000, 100, 100000, 10000, "static", "box"));
@@ -76,41 +76,41 @@ function update() {
 				if (newCollisionModel) {
 				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
 					if (objRelativeY1 < 0) {
-						if (obj1.mode == "dynamic") obj2.vy = obj1.vy;
+						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vy /= 4;
 						obj1.y = obj2.y - obj1.height;
 					} else {
-						if (obj1.mode == "dynamic") obj2.vy = obj1.vy;
+						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vy /= 4;
 						obj1.y = obj2.y + obj2.height;
 					}
 				} else {
 					if (objRelativeX1 < 0) {
-						if (obj1.mode == "dynamic") obj2.vx = obj1.vx;
+						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vx /= 4;
 						obj1.x = obj2.x - obj1.width;
 					} else {
-						if (obj1.mode == "dynamic") obj2.vx = obj1.vx;
+						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vx /= 4;
 						obj1.x = obj2.x + obj2.width;
 					}
 				}
 				} else {
 				if (objInRegion(obj1, obj2.x+5, obj2.y, obj2.width-10, obj2.height/2)) {
-					if (obj1.mode == "dynamic") obj2.vy = obj1.vy;
+					if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 					obj1.vy /= 4;
 					obj1.y = obj2.y - obj1.height;
 				} else if (objInRegion(obj1, obj2.x+5, obj2.y+obj2.height/2, obj2.width-10, obj2.height/2)) {
-					if (obj1.mode == "dynamic") obj2.vy = obj1.vy;
+					if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 					obj1.vy /= 4;
 					obj1.y = obj2.y + obj2.height;
 				}
 				if (objInRegion(obj1, obj2.x, obj2.y+5, obj2.width/2, obj2.height-10)) {
-					if (obj1.mode == "dynamic") obj2.vx = obj1.vx;
+					if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 					obj1.vx /= 4;
 					obj1.x = obj2.x - obj1.width;
 				} else if (objInRegion(obj1, obj2.x+obj2.width/2, obj2.y+5, obj2.width/2, obj2.height-10)) {
-					if (obj1.mode == "dynamic") obj2.vx = obj1.vx;
+					if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 					obj1.vx /= 4;
 					obj1.x = obj2.x + obj2.width;
 				}
