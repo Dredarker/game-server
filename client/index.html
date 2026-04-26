@@ -124,9 +124,16 @@ sounds.new = (name, source) => {
 const myData = {id: "", x: 0, y: 0};
 const myObject = {};
 
-images.source = "https://raw.githubusercontent.com/Dredarker/game-server/af79dce9ff67856b8203c5908e83810004b82029/client/img/";
-images.new("player", "player.png");
-sounds.source = "https://raw.githubusercontent.com/Dredarker/game-server/af79dce9ff67856b8203c5908e83810004b82029/client/snd/";
+images.source = "https://raw.githubusercontent.com/Dredarker/game-server/52add8b1507e8e41811bd7c1cc9fa6f18b5d899e/client/img/";
+images.new("player_body", "player.png");
+images.new("player_face", "player_face.png");
+images.new("player_arm", "player_arm.png");
+images.new("player_foot", "player_foot.png");
+images.new("player_hair", "player_hair.png");
+images.new("player_hand", "player_hand.png");
+images.new("player_head", "player_head.png");
+images.new("player_leg", "player_leg.png");
+sounds.source = "https://raw.githubusercontent.com/Dredarker/game-server/52add8b1507e8e41811bd7c1cc9fa6f18b5d899e/client/snd/";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -280,7 +287,7 @@ function drawImage(image, x, y, width, height, color) {
 	try {
 		ctx.drawImage(image, x, y, width, height);
 		ctx.fillStyle = color;
-		ctx.fillRect(x, y, width, height);
+		//ctx.fillRect(x, y, width, height);
 	} catch {
 		ctx.fillStyle = "black";
 		ctx.fillRect(x, y, width, height);
@@ -308,7 +315,18 @@ function draw() {
 
 	objects.forEach((obj, id) => {
 		if (obj.type === "player") {
-			drawImage(images.player, obj.x-camera.x, obj.y-camera.y, obj.width, obj.height, `${obj.color}80`);
+			drawImage(images.player_leg, obj.x-camera.x+10, obj.y-camera.y, 25, 100, `${obj.colorLeg}80`);
+			drawImage(images.player_foot, obj.x-camera.x+10, obj.y-camera.y, 25, 100, `${obj.colorFoot}80`);
+			drawImage(images.player_arm, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorBody}80`);
+			drawImage(images.player_hand, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorSkin}80`);
+			drawImage(images.player_leg, obj.x-camera.x+15, obj.y-camera.y, 25, 100, `${obj.colorLeg}80`);
+			drawImage(images.player_foot, obj.x-camera.x+15, obj.y-camera.y, 25, 100, `${obj.colorFoot}80`);
+			drawImage(images.player_body, obj.x-camera.x+10, obj.y-camera.y, 25, 100, `${obj.colorBody}80`);
+			drawImage(images.player_head, obj.x-camera.x-10, obj.y-camera.y, 65, 100, `${obj.color}80`);
+			drawImage(images.player_face, obj.x-camera.x-10, obj.y-camera.y, 65, 100, `${obj.color}80`);
+			drawImage(images.player_hair, obj.x-camera.x+5, obj.y-camera.y, 35, 100, `${obj.color}80`);
+			drawImage(images.player_arm, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorBody}80`);
+			drawImage(images.player_hand, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorSkin}80`);
 
 			ctx.fillStyle = obj.color;
 			ctx.font = "20px arial";
