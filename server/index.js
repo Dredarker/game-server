@@ -141,7 +141,7 @@ function checkUnderCollision(obj) {
 	return boolean;
 }
 
-function Obj(x, y, width, height, mode, type) {
+function Obj(x, y, width, height, mode, type, color = color ?? "black") {
 	this.x = x;
 	this.y = y;
 	this.width = width;
@@ -150,6 +150,7 @@ function Obj(x, y, width, height, mode, type) {
 	this.vy = 0;
 	this.mode = mode;
 	this.type = type;
+	this.color = color;
 	this.onGround = false;
 }
 
@@ -287,7 +288,7 @@ wss.on("connection", (ws, req) => {
     					clientId,
  						}));
 						clients.get(id).nickname = nickname;
-						objects.set(id, new Player(nickname, 1, -16, new Obj(0, 0, 50, 50, "dynamic", "player")));
+						objects.set(id, new Player(nickname, 1, -16, new Obj(0, 0, 50, 50, "dynamic", "player", data.color ?? "#000000")));
 						msg("", clients, `${nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
