@@ -141,7 +141,7 @@ function checkUnderCollision(obj) {
 	return boolean;
 }
 
-function Obj(x, y, width, height, mode, type, color = color ?? "black") {
+function Obj(x, y, width, height, mode, type, color = "black") {
 	this.x = x;
 	this.y = y;
 	this.width = width;
