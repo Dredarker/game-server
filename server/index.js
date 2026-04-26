@@ -70,8 +70,8 @@ function update() {
 			objRealX2 = obj2.x+obj2.width/2;
 			objRealY2 = obj2.y+obj2.height/2;
 
-			objRelativeX1 = objRealX1 - objRealX2;
-			objRelativeY1 = objRealY1 - objRealY2;
+			objRelativeX1 = (objRealX1 - objRealX2) / (obj2.width / 100);
+			objRelativeY1 = (objRealY1 - objRealY2) / (obj2.height / 100);
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (newCollisionModel) {
 				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
