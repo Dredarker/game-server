@@ -39,7 +39,7 @@ let gravity = 0.5;
 let newCollisionModel = false;
 
 const objects = new Map();
-/run objects.set("bottom", new Obj(-50000, 100, 100000, 10000, "static", "box"));
+objects.set("bottom", new Obj(-50000, 100, 100000, 10000, "static", "box"));
 objects.set("text", new Text("Spawn", "black", new Obj(50, -100, 0, 0, "none", "text")));
 
 function update() {
