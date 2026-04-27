@@ -45,8 +45,8 @@ objects.set("text", new Text("Spawn", "black", new Obj(50, -100, 0, 0, "none", "
 function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") obj.vy += gravity;
-		obj.vx = Math.round((obj.vx * !obj.onGround ? 0.99 : 0.8)/100)*100;
-		obj.vy = Math.round((obj.vy * 0.99)/100)*100;
+		obj.vx = Math.round((obj.vx * !obj.onGround ? 0.99 : 0.8)*100)/100;
+		obj.vy = Math.round((obj.vy * 0.99)*100)/100;
 
 		if (
 			obj.mode === "dynamic" ||
