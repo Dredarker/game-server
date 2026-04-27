@@ -131,6 +131,15 @@ function objInRegion(obj, x, y, width, height) {
 	)
 }
 
+function posInObj(x, y, obj) {
+	return (
+		x < obj.x + obj.width &&
+		x > obj.x &&
+		y < obj.y + obj.height &&
+		y > obj.y
+	)
+}
+
 function checkUnderCollision(obj) {
 	boolean = false;
 	objects.forEach((obj2, name) => {
@@ -278,8 +287,7 @@ wss.on("connection", (ws, req) => {
 						let editNickname = "";
 						const search = `АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!"№;%:?*()_+@#$^&-=.\\[]{}<>\`~`;
 						for (let i = 0; i < nickname.length; i++) {
-							if (!search.includes(nickname[i])) continue;
-							editNickname += nickname[i];
+							if (search.includes(nickname[i])) editNickname += nickname[i];
 						}
 						nickname = editNickname;
 
@@ -350,6 +358,23 @@ wss.on("connection", (ws, req) => {
 				type: "msg",
 				text: result,
 			}))
+		};
+
+		if (data.type === "i_break") {
+			if () objects.delete();
+		};
+
+		if (data.type === "i_build") {
+			let x = objects.get(myid).x + clients.mouseX;
+			let y = objects.get(myid).y + clients.mouseY;
+			x = Math.floor(x / 50) * 50;
+			y = Math.floor(y / 50) * 50;
+
+			let cursorInObjs = false;
+			objects.forEach((obj, id) => {
+				if (posInObj(x, y, obj)) {cursorInObjs = true};
+			});
+			if (!cursorInObjs) objects.set(Math.floor(Math.random() * 100000), new Obj(x, y, 50, 50, "static", "box"));
 		};
   });
 
