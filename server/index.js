@@ -201,7 +201,7 @@ function server_sync() {
 console.log("The game was successful initializated");
 
 let frames = 0;
-let framestosync = 3;
+let framestosync = 2;
 let iferrorframestotryagain = 0;
 let fps = 60;
 
@@ -288,7 +288,7 @@ wss.on("connection", (ws, req) => {
     					clientId,
  						}));
 						clients.get(id).nickname = nickname;
-						objects.set(id, new Player(nickname, 1, -16, new Obj(0, 0, 40, 90, "dynamic", "player", "#000000")));
+						objects.set(id, new Player(nickname, 1, -16, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
 						msg("", clients, `${nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
