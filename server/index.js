@@ -207,8 +207,6 @@ function server_sync() {
 	}
 }
 
-console.log("The game was successful initializated");
-
 let frames = 0;
 let framestosync = 2;
 let iferrorframestotryagain = 0;
@@ -229,6 +227,7 @@ function gameLoop() {
 }
 
 setInterval(gameLoop, 1000 / fps);
+console.log("The game was successful initializated");
 
 // server
 wss.on("connection", (ws, req) => {
@@ -253,8 +252,8 @@ wss.on("connection", (ws, req) => {
 
   // сохраняем клиента
   clients.set(clientId, {
-    ws,
-    ip,
+  	ws,
+  	ip,
 		nickname: "",
 		joined: false,
   });
@@ -371,8 +370,8 @@ wss.on("connection", (ws, req) => {
 		if (data.type === "i_build") {
 			let x = objects.get(myid).x + clients.get(myid).mouseX;
 			let y = objects.get(myid).y + clients.get(myid).mouseY;
-			x = Math.floor(x/50)*50;
-			y = Math.floor(y/50)*50;
+			//x = Math.floor(x/50)*50;
+			//y = Math.floor(y/50)*50;
 
 			let cursorInObjs = false;
 			objects.forEach((obj, id) => {
