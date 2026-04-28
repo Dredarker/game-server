@@ -364,22 +364,22 @@ wss.on("connection", (ws, req) => {
 		};
 
 		if (data.type === "i_break") {
-			let x = objects.get(myid).x + clients.get(myid).mouseX+25;
-			let y = objects.get(myid).y + clients.get(myid).mouseY+50;
+			let x = objects.get(myid).x + objects.get(myid).width/2 + clients.get(myid).mouseX;
+			let y = objects.get(myid).y + objects.get(myid).height/2 + clients.get(myid).mouseY;
 			objects.forEach((obj, id) => {
 				if (posInObj(x, y, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
 			})
 		};
 
 		if (data.type === "i_build") {
-			let x = objects.get(myid).x + clients.get(myid).mouseX+25;
-			let y = objects.get(myid).y + clients.get(myid).mouseY+50;
+			let x = objects.get(myid).x + objects.get(myid).width/2 + clients.get(myid).mouseX;
+			let y = objects.get(myid).y + objects.get(myid).height/2 + clients.get(myid).mouseY;
 			x = Math.floor(x/50)*50;
 			y = Math.floor(y/50)*50;
 
 			let cursorInObjs = false;
 			objects.forEach((obj, id) => {
-				if (posInObj(x, y, obj)) {cursorInObjs = true};
+				if (posInObj(x+25, y+25, obj)) {cursorInObjs = true};
 			});
 			if (!cursorInObjs) objects.set(Math.floor(Math.random() * 100000), new Obj(x, y, 50, 50, "static", "box"));
 		};
