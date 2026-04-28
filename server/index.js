@@ -362,16 +362,18 @@ wss.on("connection", (ws, req) => {
 		};
 
 		if (data.type === "i_break") {
+			let x = objects.get(myid).x + clients.get(myid).mouseX;
+			let y = objects.get(myid).y + clients.get(myid).mouseY-25;
 			objects.forEach((obj, id) => {
-				if (posInObj(clients.get(myid).mouseX, clients.get(myid).mouseY, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
+				if (posInObj(x, y, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
 			})
 		};
 
 		if (data.type === "i_build") {
 			let x = objects.get(myid).x + clients.get(myid).mouseX;
-			let y = objects.get(myid).y + clients.get(myid).mouseY;
-			//x = Math.floor(x/50)*50;
-			//y = Math.floor(y/50)*50;
+			let y = objects.get(myid).y + clients.get(myid).mouseY-25;
+			x = Math.floor(x/50)*50;
+			y = Math.floor(y/50)*50;
 
 			let cursorInObjs = false;
 			objects.forEach((obj, id) => {
