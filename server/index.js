@@ -365,7 +365,7 @@ wss.on("connection", (ws, req) => {
 
 		if (data.type === "i_break") {
 			let x = objects.get(myid).x + clients.get(myid).mouseX+25;
-			let y = objects.get(myid).y + clients.get(myid).mouseY+25;
+			let y = objects.get(myid).y + clients.get(myid).mouseY+50;
 			objects.forEach((obj, id) => {
 				if (posInObj(x, y, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
 			})
@@ -373,7 +373,7 @@ wss.on("connection", (ws, req) => {
 
 		if (data.type === "i_build") {
 			let x = objects.get(myid).x + clients.get(myid).mouseX+25;
-			let y = objects.get(myid).y + clients.get(myid).mouseY+75;
+			let y = objects.get(myid).y + clients.get(myid).mouseY+50;
 			x = Math.floor(x/50)*50;
 			y = Math.floor(y/50)*50;
 
