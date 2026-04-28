@@ -208,11 +208,12 @@ function server_sync() {
 }
 
 let frames = 0;
-let framestosync = 2;
+let framestosync = 0;
 let iferrorframestotryagain = 0;
 let fps = 60;
 
 function gameLoop() {
+	framestosync = Math.ceil(objects.size/10);
 	frames++;
 	update();
 
