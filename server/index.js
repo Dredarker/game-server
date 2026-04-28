@@ -371,7 +371,7 @@ wss.on("connection", (ws, req) => {
 
 		if (data.type === "i_build") {
 			let x = objects.get(myid).x + clients.get(myid).mouseX;
-			let y = objects.get(myid).y + clients.get(myid).mouseY-25;
+			let y = objects.get(myid).y + clients.get(myid).mouseY+25;
 			x = Math.floor(x/50)*50;
 			y = Math.floor(y/50)*50;
 
