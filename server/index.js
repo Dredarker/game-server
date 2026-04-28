@@ -297,7 +297,7 @@ wss.on("connection", (ws, req) => {
 							nickname,
  						}));
 						clients.get(id).nickname = nickname;
-						objects.set(id, new Player(nickname, 2, -16, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
+						objects.set(id, new Player(nickname, 1.4, -16, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
 						msg("", clients, `${nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
@@ -364,16 +364,16 @@ wss.on("connection", (ws, req) => {
 		};
 
 		if (data.type === "i_break") {
-			let x = objects.get(myid).x + clients.get(myid).mouseX-25;
-			let y = objects.get(myid).y + clients.get(myid).mouseY-25;
+			let x = objects.get(myid).x + clients.get(myid).mouseX+25;
+			let y = objects.get(myid).y + clients.get(myid).mouseY+25;
 			objects.forEach((obj, id) => {
 				if (posInObj(x, y, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
 			})
 		};
 
 		if (data.type === "i_build") {
-			let x = objects.get(myid).x + clients.get(myid).mouseX-25;
-			let y = objects.get(myid).y + clients.get(myid).mouseY-25;
+			let x = objects.get(myid).x + clients.get(myid).mouseX+25;
+			let y = objects.get(myid).y + clients.get(myid).mouseY+25;
 			x = Math.floor(x/50)*50;
 			y = Math.floor(y/50)*50;
 
