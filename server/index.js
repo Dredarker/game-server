@@ -35,7 +35,7 @@ const clients = new Map();
 // game
 console.log("Initializating the game");
 
-let gravity = 0.5;
+let gravity = 0.4;
 let newCollisionModel = true;
 
 const objects = new Map();
@@ -298,7 +298,7 @@ wss.on("connection", (ws, req) => {
 							nickname,
  						}));
 						clients.get(id).nickname = nickname;
-						objects.set(id, new Player(nickname, 1.4, -16, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
+						objects.set(id, new Player(nickname, 1.4, -11, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
 						msg("", clients, `${nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
