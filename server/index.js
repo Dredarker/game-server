@@ -45,8 +45,8 @@ objects.set("text", new Text("Spawn", "black", new Obj(50, -100, 0, 0, "none", "
 function update() {
 	objects.forEach((obj, name) => {
 		if (obj.mode === "dynamic") obj.vy += gravity;
-		obj.vx = Math.round((obj.vx * (!obj.onGround ? 0.99 : 0.8))*100)/100;
-		obj.vy = Math.round((obj.vy * 0.99)*100)/100;
+		obj.vx = Math.round((obj.vx*(!obj.onGround ? 0.99 : 0.8))*1000)/1000;
+		obj.vy = Math.round((obj.vy*0.99)*1000)/1000;
 
 		if (
 			obj.mode === "dynamic" ||
@@ -312,6 +312,8 @@ wss.on("connection", (ws, req) => {
         objects.forEach((obj, objId) => {
 					if (objId === myid) {
 						let keys = data.keys;
+						clients.get(myid).mouseX = data.mouseX;
+						clients.get(myid).mouseY = data.mouseY;
 						let tmpspeed = obj.speed * (obj.onGround ? 1 : 0.1);
 
 						if (keys["KeyA"]) obj.vx += -tmpspeed;
@@ -361,14 +363,16 @@ wss.on("connection", (ws, req) => {
 		};
 
 		if (data.type === "i_break") {
-			if () objects.delete();
+			objects.forEach((obj, id) => {
+				if (posInObj(x, y, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
+			})
 		};
 
 		if (data.type === "i_build") {
-			let x = objects.get(myid).x + clients.mouseX;
-			let y = objects.get(myid).y + clients.mouseY;
-			x = Math.floor(x / 50) * 50;
-			y = Math.floor(y / 50) * 50;
+			let x = objects.get(myid).x + clients.get(myid).mouseX;
+			let y = objects.get(myid).y + clients.get(myid).mouseY;
+			x = Math.floor(x/50)*50;
+			y = Math.floor(y/50)*50;
 
 			let cursorInObjs = false;
 			objects.forEach((obj, id) => {
