@@ -64,9 +64,16 @@
 		a {
 			font-family: arial;
 		}
+		i {
+			font-family: arial;
+		}
 		#title {
 			font-size: 48px;
 			font-family: arial;
+		}
+		.colume {
+			text-align: center;
+			margin: 32px
 		}
   </style>
 </head>
@@ -80,18 +87,15 @@
 	</div>
 	<div id="menu">
 		<b id="title">Cubic Build</b>
+		<i id="version">v0.0</i>
 		<div class="block">
-			<div id="left" class="inline">
+			<div id="left" class="block colume">
 				<div class="block">
-					<input id="nicknameInput"/>
-					<input id="colorInput" type="color"/>
-				</div>
-				<div class="block">
-					<input type="button" onclick="runGame()" value="Play"/>
+					<input id="nicknameInput"/><input type="button" onclick="runGame()" value="Играть"/>
 				</div>
 			</div>
-			<div id="right" class="inline">
-				<p>Our community</p>
+			<div id="right" class="block colume">
+				<p>Наше Комьюнити</p>
 				<a href="https://discord.gg/eQyezGmJHT">Discord</a>
 			</div>
 		</div>
@@ -99,7 +103,9 @@
 </body>
 
 <script>
-nicknameInput.placeholder = "Nickname";
+nicknameInput.placeholder = "Никнейм";
+var gameVersion = [0, 1, 0];
+version.innerHTML = "v"+gameVersion.join(".");
 
 menu.style.width = "700px";
 menu.style.height = "300px";
@@ -201,7 +207,6 @@ ws.onopen = (e) => {
 	sendtows({
 		type: "join",
 		nickname: document.getElementById("nicknameInput").value,
-		color: colorInput.value,
 	});
 	gameLoop();
 };
@@ -225,7 +230,7 @@ ws.onmessage = (event) => {
 };
 ws.onclose = (event) => {
 	if (event.code == 1006) messageToChat("Your connection is corrupted, so you're disconnected from game.", "red")
-	else if (event.code == 1005) messageToChat("You closed the connection by program.", "red")
+	else if (event.code == 1005) messageToChat("You/server closed connection.", "red")
 	else if (event.code == 4001) messageToChat("Server didn't expect that from you and closed the your connection.", "red")
 	else messageToChat(`You're disconnected from game, code: ${event.code}.`, "red");
 	messageToChat("Refreshing page will start in 5 seconds...", "red");
@@ -243,6 +248,10 @@ gameCanvas.oncontextmenu = () => {
 			msg: `objects.set(Math.floor(Math.random() * 100000), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, "box"))`,
 			password: console_password
 		});
+	} else {
+		sendtows({
+			type: "i_build"
+		});
 	}
 	return false;
 };
@@ -259,6 +268,8 @@ gameCanvas.onclick = () => {
 				});
 			}
 		});
+	} else {
+		sendtows({type: "i_break"});
 	}
 };
 
@@ -283,24 +294,35 @@ function sendtows(json) {
 	ws.send(JSON.stringify(json));
 }
 
-function drawImage(image, x, y, width, height, color) {
+function drawImage(image, x, y, width = null, height = null, rotation, color = "#000000", isClipped = true) {
+	ctx.save();
+	let tx = isClipped * width + x;
+	ctx.translate(tx, y);
+	//ctx.translate(-ax, -y);
+	ctx.rotate((Math.PI/180)*rotation);
+	ctx.scale(isClipped ? -1 : 1, 1);
 	try {
-		ctx.drawImage(image, x, y, width, height);
-		ctx.fillStyle = color;
-		//ctx.fillRect(x, y, width, height);
-	} catch {
-		ctx.fillStyle = "black";
+		if (width && height) {ctx.drawImage(image, 0, 0, width, height)} else {ctx.drawImage(image, 0, 0)};
+		//ctx.fillStyle = color;
+		//ctx.fillRect(0, 0, width, height);
+	} catch (err) {
+		ctx.fillStyle = "red";
 		ctx.fillRect(x, y, width, height);
 	};
+	ctx.restore();
 }
 
+window.myframes = 0;
 function update() {
+	myframes++;
 	canvas.width = document.documentElement.clientWidth;
 	canvas.height = document.documentElement.clientHeight;
 	document.getElementById("chat").style.bottom = -document.getElementById("gameCanvas").height+"px";
 	sendtows({
 		type: "sync",
 		keys,
+		mouseX: mouseX-canvas.width/2,
+		mouseY: mouseY-canvas.height/2,
 	});
 	objects.forEach((obj, id) => {
 		if (id === myData.id) {
@@ -315,18 +337,29 @@ function draw() {
 
 	objects.forEach((obj, id) => {
 		if (obj.type === "player") {
-			drawImage(images.player_leg, obj.x-camera.x+10, obj.y-camera.y, 25, 100, `${obj.colorLeg}80`);
-			drawImage(images.player_foot, obj.x-camera.x+10, obj.y-camera.y, 25, 100, `${obj.colorFoot}80`);
-			drawImage(images.player_arm, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorBody}80`);
-			drawImage(images.player_hand, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorSkin}80`);
-			drawImage(images.player_leg, obj.x-camera.x+15, obj.y-camera.y, 25, 100, `${obj.colorLeg}80`);
-			drawImage(images.player_foot, obj.x-camera.x+15, obj.y-camera.y, 25, 100, `${obj.colorFoot}80`);
-			drawImage(images.player_body, obj.x-camera.x+10, obj.y-camera.y, 25, 100, `${obj.colorBody}80`);
-			drawImage(images.player_head, obj.x-camera.x-10, obj.y-camera.y, 65, 100, `${obj.color}80`);
-			drawImage(images.player_face, obj.x-camera.x-10, obj.y-camera.y, 65, 100, `${obj.color}80`);
-			drawImage(images.player_hair, obj.x-camera.x+5, obj.y-camera.y, 35, 100, `${obj.color}80`);
-			drawImage(images.player_arm, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorBody}80`);
-			drawImage(images.player_hand, obj.x-camera.x+15, obj.y-camera.y-15, 25, 100, `${obj.colorSkin}80`);
+			if (obj.vx > 0) {obj.isClipped = true} else {obj.isClipped = false};
+			handclip = -10*obj.isClipped;
+			legclip = -5*obj.isClipped;
+
+			let tmprotik = Math.sin(myframes*Math.round(obj.vx)/20)*obj.vx;
+			let rotik = obj.onGround ? tmprotik : obj.vy/2+10;
+			let tmprotik2 = Math.sin((myframes+8)*Math.round(obj.vx)/20)*obj.vx;
+			let rotik2 = obj.onGround ? tmprotik2 : obj.vy/2+10;
+			let ygrek = Math.sin(myframes/30)*2;
+			let ygrek2 = Math.sin((myframes+20)/30)*2;
+
+			drawImage(images.player_leg, obj.x-camera.x+10+legclip, obj.y-camera.y, 25, 100, -rotik, `${obj.colorLeg}`, obj.isClipped);
+			drawImage(images.player_foot, obj.x-camera.x+10+legclip, obj.y-camera.y, 25, 100, -rotik, `${obj.colorFoot}`, obj.isClipped);
+			drawImage(images.player_arm, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2, 25, 100, rotik, `${obj.colorBody}`, obj.isClipped);
+			drawImage(images.player_hand, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2, 25, 100, rotik, `${obj.colorSkin}`, obj.isClipped);
+			drawImage(images.player_leg, obj.x-camera.x+15+legclip, obj.y-camera.y, 25, 100, rotik, `${obj.colorLeg}`, obj.isClipped);
+			drawImage(images.player_foot, obj.x-camera.x+15+legclip, obj.y-camera.y, 25, 100, rotik, `${obj.colorFoot}`, obj.isClipped);
+			drawImage(images.player_body, obj.x-camera.x+10, obj.y-camera.y+ygrek, 25, 100, obj.vx/3, `${obj.colorBody}`, obj.isClipped);
+			drawImage(images.player_head, obj.x-camera.x-10, obj.y-camera.y-5+ygrek, 65, 100, obj.vx/3, `${obj.colorSkin}`, obj.isClipped);
+			drawImage(images.player_face, obj.x-camera.x-10, obj.y-camera.y-5+ygrek, 65, 100, obj.vx/3, "#000000", obj.isClipped);
+			drawImage(images.player_hair, obj.x-camera.x+5, obj.y-camera.y-5+ygrek, 35, 100, obj.vx/3, `${obj.color}`, obj.isClipped);
+			drawImage(images.player_arm, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2, 25, 100, -rotik2, `${obj.colorBody}`, obj.isClipped);
+			drawImage(images.player_hand, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2, 25, 100, -rotik2, `${obj.colorSkin}`, obj.isClipped);
 
 			ctx.fillStyle = obj.color;
 			ctx.font = "20px arial";
