@@ -364,7 +364,7 @@ wss.on("connection", (ws, req) => {
 
 		if (data.type === "i_break") {
 			objects.forEach((obj, id) => {
-				if (posInObj(x, y, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
+				if (posInObj(clients.get(myid).mouseX, clients.get(myid).mouseY, obj) && typeof(id) == "number" && obj.type != "player") objects.delete(id);
 			})
 		};
 
