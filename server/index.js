@@ -188,7 +188,6 @@ function msg(from, to, text) {
 	      type: "msg",
 	      from,
 	      text,
-	      ip: (clientData.ip == adminIp ? clients.get(clientId).ip : "none"),
 			}));
 		}
 	}
