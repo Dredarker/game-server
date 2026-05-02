@@ -64,7 +64,7 @@ function update() {
 			if (obj2.mode == "none") return;
 
 			obj.onGround = false;
-			if (checkUnderCollision(obj) && obj1.mode != "none") obj.onGround = true;
+			if (checkUnderCollision(obj) && obj2.mode != "none") obj.onGround = true;
 
 			objRealX1 = obj1.x+obj1.width/2;
 			objRealY1 = obj1.y+obj1.height/2;
@@ -76,7 +76,7 @@ function update() {
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (newCollisionModel) {
 				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
-					if (objRelativeY1 < 0) {
+					if (objRelativeY1 < 0 && obj2.type != "platform") {
 						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vy /= 4;
 						obj1.y = obj2.y - obj1.height;
@@ -85,7 +85,7 @@ function update() {
 						obj1.vy /= 4;
 						obj1.y = obj2.y + obj2.height;
 					}
-				} else {
+				} else if (obj2.type != "platform") {
 					if (objRelativeX1 < 0) {
 						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vx /= 4;
@@ -121,6 +121,7 @@ function update() {
 	});
 }
 
+let customBeforeUpdate = () => {};
 let customUpdate = () => {};
 
 function objInRegion(obj, x, y, width, height) {
@@ -216,6 +217,14 @@ let fps = 60;
 function gameLoop() {
 	framestosync = Math.ceil(objects.size/10);
 	frames++;
+
+	if (iferrorframestotryagain <= 0) {
+		try {customBeforeUpdate()} catch (err) {
+			iferrorframestotryagain = 15*fps;
+			msg("", clients, err);
+		}
+	}
+
 	update();
 
 	if (iferrorframestotryagain <= 0) {
