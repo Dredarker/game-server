@@ -108,7 +108,7 @@
 
 <script>
 nicknameInput.placeholder = "Никнейм";
-var gameVersion = [0, 1, 0];
+var gameVersion = [0, 1, 1];
 version.innerHTML = "v"+gameVersion.join(".");
 
 menu.style.width = "700px";
@@ -149,7 +149,7 @@ const helpBook = [
 	"СA - Большинство действий требует пароль от консоля",
 ];
 
-const myData = {id: "", x: 0, y: 0};
+const myData = {id: "", x: 0, y: 0, syncx: 0, syncy: 0};
 const myObject = {};
 
 images.source = "https://raw.githubusercontent.com/Dredarker/game-server/52add8b1507e8e41811bd7c1cc9fa6f18b5d899e/client/img/";
@@ -211,6 +211,7 @@ document.addEventListener("keydown", (event) => {
 						console_mode.width = args[2];
 						console_mode.height = args[3];
 						console_mode.objmode = args[4];
+						console_mode.objtype = args[5];
 					}
 					messageToChat(`Установлен режим консоля на ${console_mode.mode}`, "#aaaaaa")
 				}
@@ -219,11 +220,11 @@ document.addEventListener("keydown", (event) => {
 				if (!isNaN(Number(args[1]))) {cmd = `
 					objects.get(myid).x = ${args[1]}; objects.get(myid).y = ${args[2]}
 				`} else if (!isNaN(Number(args[2]))) {cmd = `
-				objects.forEach((obj, id) => {if (obj.nickname == "${args[1]}") obj.x = ${args[2]}, obj.y = ${args[3]}})
+					objects.forEach((obj, id) => {if (obj.nickname == "${args[1]}") obj.x = ${args[2]}, obj.y = ${args[3]}})
 				`} else {cmd = `
-				let obj1;
-				objects.forEach((obj, id) => {if (obj.nickname == "${args[1]}") obj1 = obj})
-				objects.forEach((obj, id) => {if (obj.nickname == "${args[2]}") {obj1.x = obj.x; obj1.y = obj.y;}})
+					let obj1;
+					objects.forEach((obj, id) => {if (obj.nickname == "${args[1]}") obj1 = obj})
+					objects.forEach((obj, id) => {if (obj.nickname == "${args[2]}") {obj1.x = obj.x; obj1.y = obj.y;}})
 				`};
 				sendtows({type: "console", msg: cmd, password: console_password})
 			} else if (args[0] == "/kick") {
@@ -272,11 +273,10 @@ ws.onmessage = (event) => {
 	} catch (err) {console.error(err)};
 };
 ws.onclose = (event) => {
-	if (event.code == 1006) messageToChat("Your connection is corrupted, so you're disconnected from game.", "red")
-	else if (event.code == 1005) messageToChat("You/server closed connection.", "red")
-	else if (event.code == 4001) messageToChat("Server didn't expect that from you and closed the your connection.", "red")
-	else messageToChat(`You're disconnected from game, code: ${event.code}.`, "red");
-	messageToChat("Refreshing page will start in 5 seconds...", "red");
+	if (event.code == 1006) messageToChat("Соединение прервано.", "red")
+	else if (event.code == 1005) messageToChat("Вы отключились/Сервер отключил вас от игры.", "red")
+	else messageToChat("Вас отключили от игры, "+event.code, "red");
+	messageToChat("Перезапуск страницы через 5 секунд...", "red");
 	setTimeout(() => {location.reload()}, 5000);
 };
 
@@ -289,7 +289,7 @@ gameCanvas.oncontextmenu = () => {
 		y = Math.floor(y / minimal) * minimal;
 		sendtows({
 			type: "console",
-			msg: `objects.set(Math.floor(Math.random() * 100000), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, "box"))`,
+			msg: `objects.set(Math.floor(Math.random() * 100000), new Obj(${x}, ${y}, ${console_mode.width}, ${console_mode.height}, ${console_mode.objmode}, ${console_mode.objtype}))`,
 			password: console_password
 		});
 	} else {
@@ -381,6 +381,12 @@ function draw() {
 
 	objects.forEach((obj, id) => {
 		if (obj.type === "player") {
+			if (id === myData.id) {
+				myData.syncx += (obj.x - myData.syncx) / 3;
+				myData.syncy += (obj.y - myData.syncy) / 3;
+				obj.x = myData.syncx;
+				obj.y = myData.syncy;
+			}
 			if (obj.vx > 0) {obj.isClipped = true} else {obj.isClipped = false};
 			handclip = -10*obj.isClipped;
 			legclip = -5*obj.isClipped;
@@ -395,18 +401,21 @@ function draw() {
 			let ygrek = Math.sin(myframes/30)*2;
 			let ygrek2 = Math.sin((myframes+10)/30)*2;
 
-			drawImage(images.player_leg, obj.x-camera.x+10+legclip, obj.y-camera.y, 25, obj.height, -rotik, `${obj.colorLeg}`, obj.isClipped);
-			drawImage(images.player_foot, obj.x-camera.x+10+legclip, obj.y-camera.y, 25, obj.height, -rotik, `${obj.colorFoot}`, obj.isClipped);
-			drawImage(images.player_arm, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, 25, armH, rotik, `${obj.colorBody}`, obj.isClipped);
-			drawImage(images.player_hand, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, 25, obj.height, rotik, `${obj.colorSkin}`, obj.isClipped);
-			drawImage(images.player_leg, obj.x-camera.x+15+legclip, obj.y-camera.y, 25, obj.height, rotik, `${obj.colorLeg}`, obj.isClipped);
-			drawImage(images.player_foot, obj.x-camera.x+15+legclip, obj.y-camera.y, 25, obj.height, rotik, `${obj.colorFoot}`, obj.isClipped);
-			drawImage(images.player_body, obj.x-camera.x+10, obj.y-camera.y+ygrek, 25, obj.height, obj.vx/3, `${obj.colorBody}`, obj.isClipped);
-			drawImage(images.player_head, obj.x-camera.x-10, obj.y-camera.y-5+ygrek, 65, 100, obj.vx/3, `${obj.colorSkin}`, obj.isClipped);
-			drawImage(images.player_face, obj.x-camera.x-10, obj.y-camera.y-5+ygrek, 65, 100, obj.vx/3, "#000000", obj.isClipped);
-			drawImage(images.player_hair, obj.x-camera.x+5, obj.y-camera.y-5+ygrek, 35, 100, obj.vx/3, `${obj.color}`, obj.isClipped);
-			drawImage(images.player_arm, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, 25, armH, -rotik2, `${obj.colorBody}`, obj.isClipped);
-			drawImage(images.player_hand, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, 25, obj.height, -rotik2, `${obj.colorSkin}`, obj.isClipped);
+			let width2 = (obj.width-40)/2;
+			let width = 25+obj.width-40;
+
+			drawImage(images.player_leg, obj.x-camera.x+10+legclip, obj.y-camera.y, width, obj.height, -rotik, `${obj.colorLeg}`, obj.isClipped);
+			drawImage(images.player_foot, obj.x-camera.x+10+legclip, obj.y-camera.y, width, obj.height, -rotik, `${obj.colorFoot}`, obj.isClipped);
+			drawImage(images.player_arm, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, width, armH, rotik, `${obj.colorBody}`, obj.isClipped);
+			drawImage(images.player_hand, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, width, obj.height, rotik, `${obj.colorSkin}`, obj.isClipped);
+			drawImage(images.player_leg, obj.x-camera.x+15+legclip, obj.y-camera.y, width, obj.height, rotik, `${obj.colorLeg}`, obj.isClipped);
+			drawImage(images.player_foot, obj.x-camera.x+15+legclip, obj.y-camera.y, width, obj.height, rotik, `${obj.colorFoot}`, obj.isClipped);
+			drawImage(images.player_body, obj.x-camera.x+10, obj.y-camera.y+ygrek, width, obj.height, obj.vx/3, `${obj.colorBody}`, obj.isClipped);
+			drawImage(images.player_head, obj.x-camera.x-10+width2, obj.y-camera.y-5+ygrek, 65, 100, obj.vx/3, `${obj.colorSkin}`, obj.isClipped);
+			drawImage(images.player_face, obj.x-camera.x-10+width2, obj.y-camera.y-5+ygrek, 65, 100, obj.vx/3, "#000000", obj.isClipped);
+			drawImage(images.player_hair, obj.x-camera.x+5+width2, obj.y-camera.y-5+ygrek, 35, 100, obj.vx/3, `${obj.color}`, obj.isClipped);
+			drawImage(images.player_arm, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, width, armH, -rotik2, `${obj.colorBody}`, obj.isClipped);
+			drawImage(images.player_hand, obj.x-camera.x+15+handclip, obj.y-camera.y-20+ygrek2+eax, width, obj.height, -rotik2, `${obj.colorSkin}`, obj.isClipped);
 
 			ctx.fillStyle = obj.color;
 			ctx.font = "20px arial";
