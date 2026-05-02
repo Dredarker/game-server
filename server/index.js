@@ -76,11 +76,11 @@ function update() {
 			if (objInRegion(obj1, obj2.x, obj2.y, obj2.width, obj2.height)) {
 				if (newCollisionModel) {
 				if (Math.abs(objRelativeX1) < Math.abs(objRelativeY1)) {
-					if (objRelativeY1 < 0 && obj2.type != "platform") {
+					if (objRelativeY1 < 0) {
 						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vy /= 4;
 						obj1.y = obj2.y - obj1.height;
-					} else {
+					} else if (obj2.type != "platform") {
 						if (obj1.mode == "dynamic") {obj2.vx = obj1.vx; obj2.vy = obj1.vy}
 						obj1.vy /= 4;
 						obj1.y = obj2.y + obj2.height;
