@@ -34,6 +34,7 @@ const clients = new Map();
 
 // game
 console.log("Initializating the game");
+const badwords = [".б[аеу]", "шлю.", ".ля", ".уй", "чл.н", "п..д", "п.д", "сос.", "тр.."];
 
 let gravity = 0.4;
 let newCollisionModel = true;
@@ -295,7 +296,6 @@ wss.on("connection", (ws, req) => {
     					type: "init",
     					clientId,
 							nickname,
-							nickname,
  						}));
 						clients.get(id).nickname = nickname;
 						objects.set(id, new Player(nickname, 1.4, -11, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
@@ -330,8 +330,10 @@ wss.on("connection", (ws, req) => {
     }
 
     if (data.type === "msg") {
-			if (data.text.length < 200) {
-				msg(clients.get(myid).nickname, clients, data.text);
+			let str = data.text;
+			for (let filterword of badwords) {str = str.replace(new RegExp(filterword, "ig"), "***")};
+			if (str.length < 200) {
+				msg(clients.get(myid).nickname, clients, str);
 			} else {
 				ws.close(4012);
 			}
