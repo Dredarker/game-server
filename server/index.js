@@ -34,7 +34,7 @@ const clients = new Map();
 
 // game
 console.log("Initializating the game");
-const badwords = [".б[аеу]", "шлю.", ".ля", ".уй", "чл.н", "п..д", "п.д", "сос.", "тр.."];
+const badwords = [".[б6][аеу]", "шлю.", ".ля", ".[уy][яй]", "чл.н", "п..д", "п.д", "[сc][оo][сc].", "т[рp].[хxh]", "гн."];
 
 let gravity = 0.4;
 let newCollisionModel = true;
