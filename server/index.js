@@ -4,8 +4,6 @@ const { v4: uuidv4 } = require("uuid");
 
 const PORT = process.env.PORT || 3000;
 
-const adminIp = "5.137.96.67";
-
 const bannedIps = new Set([
   "123.123.123.123"
 ]);
