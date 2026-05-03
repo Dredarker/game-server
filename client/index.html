@@ -92,14 +92,14 @@
 		<div class="block">
 			<div id="left" class="block colume">
 				<div class="block">
-					<input id="nicknameInput"/><input type="button" onclick="runGame()" value="Играть"/>
+					<input id="nicknameInput"/><input type="button" onclick="runGame()" value="Play"/>
 				</div>
 				<div class="block">
 					<b style="color:red" id="error"></b>
 				</div>
 			</div>
 			<div id="right" class="block colume">
-				<p>Наше Комьюнити</p>
+				<p>Our Community</p>
 				<a href="https://discord.gg/eQyezGmJHT">Discord</a>
 			</div>
 		</div>
@@ -107,7 +107,7 @@
 </body>
 
 <script>
-nicknameInput.placeholder = "Никнейм";
+nicknameInput.placeholder = "Nickname";
 var gameVersion = [0, 1, 1];
 version.innerHTML = "v"+gameVersion.join(".");
 
@@ -120,7 +120,7 @@ nicknameInput.maxLength = 20;
 
 function runGame() {
 if (!(nicknameInput.value.length >= 3 && nicknameInput.value.length <= 20)) {
-	error.innerHTML = "Никнейм должен быть длиной от 3 до 20 символов";
+	error.innerHTML = "Nickname's length need be 3 - 20";
 	return;
 }
 
@@ -139,14 +139,13 @@ sounds.new = (name, source) => {
 
 const helpBook = [
 	"Помощь:",
-	"/run (code) - запускает код 1 раз (A)",
-	"/pass (password) - записывает и сохраняет пароль от консоля",
-	"/mode (mode) ... - выбирает режим (СА)",
-	"/tp (pos)|(nickname) (nickname|pos)] - телепортирует вас на позицию/игрока к игроку/игрока на позицию (A)",
-	"/kick (nickname) - исключает игрока (A)",
+	"/run (code) - executes code (A)",
+	"/pass (password) - sets console password",
+	"/mode (mode) ... - selects console mode (A)",
+	"/tp (pos)|(nickname) (nickname|pos)] - teleports you/player to position/player (A)",
+	"/kick (nickname) - kicks player (A)",
 	"--------------------------------------------------------------------",
-	"A - Требует пароль от консоля",
-	"СA - Большинство действий требует пароль от консоля",
+	"A - Requests console password",
 ];
 
 const myData = {id: "", x: 0, y: 0, syncx: 0, syncy: 0};
@@ -198,14 +197,14 @@ document.addEventListener("keydown", (event) => {
 			} else if (args[0] == "/pass") {
 				console_password = inputvalue.slice(6);
 				localStorage.setItem("console_password", console_password);
-				messageToChat("Установлен пароль от консоля на "+console_password, "#aaaaaa");
+				messageToChat("Set console password to "+console_password, "#aaaaaa");
 			} else if (args[0] == "/mode") {
 				console_mode.mode = args[1] ?? "";
 				if (console_mode.mode == "") {
-					messageToChat("Доступные режимы консоля:", "#aaaaaa");
-					messageToChat("• build (width) (height) (objmode) - строительство блока", "#aaaaaa");
+					messageToChat("Avaliable modes:", "#aaaaaa");
+					messageToChat("• build (width) (height) (objmode) (objtype)", "#aaaaaa");
 					messageToChat("-------------------------------------", "#aaaaaa");
-					messageToChat("Также был очищен режим", "#aaaaaa");
+					messageToChat("Also emtped mode", "#aaaaaa");
 				} else {
 					if (args[1] == "build") {
 						console_mode.width = args[2];
@@ -273,10 +272,10 @@ ws.onmessage = (event) => {
 	} catch (err) {console.error(err)};
 };
 ws.onclose = (event) => {
-	if (event.code == 1006) messageToChat("Соединение прервано.", "red")
-	else if (event.code == 1005) messageToChat("Вы отключились/Сервер отключил вас от игры.", "red")
-	else messageToChat("Вас отключили от игры, "+event.code, "red");
-	messageToChat("Перезапуск страницы через 5 секунд...", "red");
+	if (event.code == 1006) messageToChat("Connection is corruped", "red")
+	else if (event.code == 1005) messageToChat("You disconnected from game", "red")
+	else messageToChat("You are disconnected from game, "+event.code, "red");
+	messageToChat("Page will restart in 5 seconds...", "red");
 	setTimeout(() => {location.reload()}, 5000);
 };
 
