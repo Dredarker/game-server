@@ -283,7 +283,7 @@ wss.on("connection", (ws, req) => {
   ws.on("message", (message) => {
 		let myid;
 		clients.forEach((clientData, id) => {
-			if (clientData.ws === ws) {myid = id;break;}
+			if (clientData.ws === ws) myid = id;
 		});
 
 		let data;
