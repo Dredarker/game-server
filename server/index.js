@@ -207,6 +207,8 @@ function server_sync() {
 		tmpobj.type = obj.type;
 		tmpobj.color = obj.color;
 		if (obj.nickname) tmpobj.nickname = obj.nickname;
+		if (obj.text) tmpobj.text = obj.text;
+		if (obj.textColor) tmpobj.textColor = obj.textColor;
   	objectsForClient.set(id, tmpobj);
 	});
 	for (const [id, clientData] of clients.entries()) {
@@ -319,7 +321,7 @@ wss.on("connection", (ws, req) => {
 							nickname,
  						}));
 						clients.get(id).nickname = nickname;
-						objects.set(id, new Player(nickname, 1.4, -11, new Obj(0, 0, 40, 100, "dynamic", "player", "#000000")));
+						objects.set(id, new Player(nickname, 1.4, -11, new Obj(0, 0, 24, 80, "dynamic", "player", "#000000")));
 						msg("", clients, `${nickname} connected to game`);
 						clients.get(id).joined = true;
 						break;
