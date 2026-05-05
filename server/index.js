@@ -194,13 +194,25 @@ function msg(from, to, text) {
 }
 
 function server_sync() {
+	let objectsForClient = new Map();
+	objects.forEach((obj, id) => {
+  	let tmpobj = {};
+  	tmpobj.x = obj.x;
+  	tmpobj.y = obj.y;
+  	tmpobj.vx = obj.vx;
+  	tmpobj.vy = obj.vy;
+		tmpobj.type = obj.type;
+		obj.onGround = obj.onGround;
+		tmpobj.color = obj.color;
+  	objectsForClient.set(id, tmpobj);
+	});
 	for (const [id, clientData] of clients.entries()) {
 		if (!clientData.joined) return;
   	const client = clientData.ws;
   	if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify({
 				type: "sync",
-				world: Object.fromEntries(objects)
+				world: objectsForClient,
 			}));
 	  }
 	}
@@ -269,12 +281,12 @@ wss.on("connection", (ws, req) => {
   console.log(`Client connected: ${clientId} (${ip})`);
 
   ws.on("message", (message) => {
-    let data;
 		let myid;
-		for (const [id, clientData] of clients.entries()) {
+		clients.forEach((clientData, id) => {
 			if (clientData.ws === ws) {myid = id;break;}
-		}
+		});
 
+		let data;
     try {
       data = JSON.parse(message);
     } catch {
@@ -287,7 +299,7 @@ wss.on("connection", (ws, req) => {
 					if (clientData.ws === ws) {
 						let nickname = data.nickname;
 						if (!(nickname.length >= 3 && nickname.length <= 20)) {
-							ws.close(4011);
+							ws.close(2011);
 							return;
 						}
 
@@ -311,7 +323,7 @@ wss.on("connection", (ws, req) => {
 					}
       	}
 			} else {
-				ws.close(4002);
+				ws.close(2002);
 			}
     };
 
@@ -337,11 +349,11 @@ wss.on("connection", (ws, req) => {
 
     if (data.type === "msg") {
 			let str = data.text;
-			for (let filterword of badwords) {str = str.replace(new RegExp(filterword, "ig"), "***")};
-			if (str.length < 200) {
+			if (str.length <= 250) {
+				for (let filterword of badwords) {str = str.replace(new RegExp(filterword, "ig"), "***")};
 				msg(clients.get(myid).nickname, clients, str);
 			} else {
-				ws.close(4012);
+				ws.close(2012);
 			}
 		}
 
