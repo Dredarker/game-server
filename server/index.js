@@ -212,7 +212,7 @@ function server_sync() {
   	if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify({
 				type: "sync",
-				world: objectsForClient,
+				world: objectsForClient.entries(),
 			}));
 	  }
 	}
