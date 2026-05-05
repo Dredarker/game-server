@@ -199,11 +199,14 @@ function server_sync() {
   	let tmpobj = {};
   	tmpobj.x = obj.x;
   	tmpobj.y = obj.y;
+  	tmpobj.width = obj.width;
+  	tmpobj.height = obj.height;
   	tmpobj.vx = obj.vx;
   	tmpobj.vy = obj.vy;
+		tmpobj.onGround = obj.onGround;
 		tmpobj.type = obj.type;
-		obj.onGround = obj.onGround;
 		tmpobj.color = obj.color;
+		if (obj.nickname) tmpobj.nickname = obj.nickname;
   	objectsForClient.set(id, tmpobj);
 	});
 	for (const [id, clientData] of clients.entries()) {
